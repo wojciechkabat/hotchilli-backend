@@ -8,7 +8,7 @@ data class Picture(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+        val id: Long?,
 
         @Column(name = "external_id")
         val externalIdentifier: String?,
