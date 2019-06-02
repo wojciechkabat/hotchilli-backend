@@ -5,6 +5,6 @@ data class UserDto (
         val username: String,
         val age: Int,
         val pictures: List<PictureDto>,
-        val averageVote: Double,
+        val averageRating: Double,
         val voteCount: Long
 )
