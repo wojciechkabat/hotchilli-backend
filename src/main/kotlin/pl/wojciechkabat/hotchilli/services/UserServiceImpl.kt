@@ -16,13 +16,13 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
 
         return randomUsers.stream()
                 .map {
-                    val voteData: VoteData = voteDataForUsers[it.id]!!
+                    val voteData: VoteData = voteDataForUsers[it.id] ?: VoteData(it.id!!, 0.0, 0)
                     UserDto(
                             it.id,
                             it.username,
                             it.age,
                             PictureMapper.mapToDto(it.pictures),
-                            voteData.averageRating ?: 0.0,
+                            voteData.averageRating,
                             voteData.voteCount)
                 }
                 .collect(toList())
