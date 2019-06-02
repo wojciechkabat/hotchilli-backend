@@ -2,6 +2,7 @@ package pl.wojciechkabat.hotchilli.services
 
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.UserDto
+import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import java.util.stream.Collectors.toList as toList
@@ -10,9 +11,12 @@ import java.util.stream.Collectors.toList as toList
 class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteService) : UserService {
     override fun provideRandomUsers(number: Int): List<UserDto> {
         val randomUsers = userRepository.findRandomUsers(20)
+        val voteDataForUsers: Map<Long, VoteData> = voteService.findVoteDataForUsers(randomUsers.stream().map { it.id!! }.collect(toList()))
+                .associateBy({ it.userId }, { it })
+
         return randomUsers.stream()
                 .map {
-                    val voteData = voteService.findVoteDataForUser(it.id!!)
+                    val voteData: VoteData = voteDataForUsers[it.id]!!
                     UserDto(
                             it.id,
                             it.username,

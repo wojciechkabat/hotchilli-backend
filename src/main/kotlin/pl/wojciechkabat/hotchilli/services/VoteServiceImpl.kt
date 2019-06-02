@@ -1,7 +1,7 @@
 package pl.wojciechkabat.hotchilli.services
 
 import org.springframework.stereotype.Service
-import pl.wojciechkabat.hotchilli.dtos.VoteDataDto
+import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.dtos.VoteDto
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.entities.Vote
@@ -10,6 +10,10 @@ import java.time.LocalDateTime
 
 @Service
 class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
+    override fun findVoteDataForUsers(userIds: List<Long>): List<VoteData> {
+        return voteRepository.findVoteDataByUserIds(userIds)
+    }
+
     override fun persistVote(voteDto: VoteDto, currentUser: User) {
         voteRepository.save(
                 Vote(
@@ -20,9 +24,5 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
                         LocalDateTime.now()
                 )
         )
-    }
-
-    override fun findVoteDataForUser(userId: Long): VoteDataDto {
-        return voteRepository.findVoteDataByUserId(userId)
     }
 }
