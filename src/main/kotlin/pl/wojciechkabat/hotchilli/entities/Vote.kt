@@ -9,13 +9,13 @@ data class Vote(
         @Id
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+        val id: Long?,
         @Column(name = "voting_user_id", nullable = false)
         val votingUserId: Long,
         @Column(name = "rated_user_id", nullable = false)
         val ratedUserId: Long,
-        @Column(name = "value", nullable = false)
-        val value: Double,
+        @Column(name = "rating", nullable = false)
+        val rating: Double,
         @Column(name = "created_at", nullable = false)
         val createdAt: LocalDateTime
 )
