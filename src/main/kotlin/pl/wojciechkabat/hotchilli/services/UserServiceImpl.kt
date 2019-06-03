@@ -3,7 +3,9 @@ package pl.wojciechkabat.hotchilli.services
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.UserDto
 import pl.wojciechkabat.hotchilli.dtos.VoteData
+import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
+import pl.wojciechkabat.hotchilli.security.exceptions.NoUserWithGivenEmailException
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import java.util.stream.Collectors.toList as toList
 
@@ -26,5 +28,9 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                             voteData.voteCount)
                 }
                 .collect(toList())
+    }
+
+    override fun findByEmail(email: String): User {
+        return userRepository.findByEmail(email).orElseThrow(({ NoUserWithGivenEmailException() }))
     }
 }
