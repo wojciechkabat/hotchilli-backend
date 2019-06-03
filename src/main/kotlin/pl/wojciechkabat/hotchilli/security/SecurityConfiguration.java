@@ -37,7 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final TokenService tokenService;
     private final JwtSettings jwtSettings;
 
-    private static final String SIGN_UP_URL = "/register";
+    private static final String SIGN_UP_URL = "/registration";
     private static final String GET_NEW_ACCESS_TOKEN = "/api/auth/token/**";
     private static final String LOGIN = "/login";
 
