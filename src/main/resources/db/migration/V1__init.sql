@@ -2,7 +2,7 @@ CREATE TABLE users (
   id BIGSERIAL PRIMARY KEY,
   username varchar(100) NOT NULL,
   email varchar(100) NOT NULL,
-  age integer NOT NULL
+  birthday date NOT NULL
 );
 
 CREATE TABLE pictures (

@@ -41,7 +41,7 @@ class AccountServiceImpl (
                         null,
                         registrationDto.email,
                         registrationDto.username,
-                        23,
+                        registrationDto.dateOfBirth,
                         ArrayList(),
                         listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
                         bCryptPasswordEncoder.encode(registrationDto.password)

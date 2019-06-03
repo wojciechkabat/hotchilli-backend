@@ -2,6 +2,7 @@ package pl.wojciechkabat.hotchilli.entities
 
 import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CascadeType
+import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
@@ -18,8 +19,8 @@ data class User(
         @Column(name = "username", nullable = false)
         val username: String,
 
-        @Column(name = "age", nullable = false)
-        val age: Int,
+        @Column(name = "birthday")
+        val dateOfBirth: LocalDate,
 
         @OneToMany
         @Cascade(CascadeType.ALL)

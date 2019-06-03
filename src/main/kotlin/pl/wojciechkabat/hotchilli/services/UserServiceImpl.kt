@@ -8,6 +8,10 @@ import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.exceptions.NoUserWithGivenEmailException
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import java.util.stream.Collectors.toList as toList
+import java.time.Period
+import java.time.LocalDate
+
+
 
 @Service
 class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteService) : UserService {
@@ -22,7 +26,7 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                     UserDto(
                             it.id,
                             it.username,
-                            it.age,
+                            calculateAge(it.dateOfBirth),
                             PictureMapper.mapToDto(it.pictures),
                             voteData.averageRating,
                             voteData.voteCount)
@@ -32,5 +36,9 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
 
     override fun findByEmail(email: String): User {
         return userRepository.findByEmail(email).orElseThrow(({ NoUserWithGivenEmailException() }))
+    }
+
+    fun calculateAge(birthDate: LocalDate): Int {
+        return Period.between(birthDate, LocalDate.now()).years
     }
 }
