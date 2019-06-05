@@ -1,6 +1,7 @@
 package pl.wojciechkabat.hotchilli.security.model;
 
 import org.springframework.stereotype.Service;
+import pl.wojciechkabat.hotchilli.entities.GuestUser;
 import pl.wojciechkabat.hotchilli.entities.User;
 import pl.wojciechkabat.hotchilli.security.exceptions.NoRefreshTokenFound;
 
@@ -27,6 +28,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Transactional
     public void deleteByUserAndDeviceId(User user, String deviceId) {
         tokenRepository.deleteByUserAndDeviceId(user, deviceId);
+        tokenRepository.flush();
+    }
+
+    @Transactional
+    public void deleteByGuestUser(GuestUser guestUser) {
+        tokenRepository.deleteByGuestUser(guestUser);
         tokenRepository.flush();
     }
 }

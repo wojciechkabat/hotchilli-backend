@@ -5,5 +5,5 @@ import org.springframework.security.core.Authentication;
 import java.util.Map;
 
 public interface TokenService {
-    Map<String, String> getTokens(Authentication auth);
+    Map<String, String> getTokens(Authentication auth, boolean isGuest);
 }
