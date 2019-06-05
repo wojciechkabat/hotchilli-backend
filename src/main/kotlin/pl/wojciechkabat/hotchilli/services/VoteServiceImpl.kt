@@ -3,6 +3,7 @@ package pl.wojciechkabat.hotchilli.services
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.dtos.VoteDto
+import pl.wojciechkabat.hotchilli.entities.GuestUser
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.entities.Vote
 import pl.wojciechkabat.hotchilli.repositories.VoteRepository
@@ -18,7 +19,19 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
         voteRepository.save(
                 Vote(
                         null,
-                        currentUser.id!!,
+                        (currentUser.id!!).toString(),
+                        voteDto.ratedUserId,
+                        voteDto.rating,
+                        LocalDateTime.now()
+                )
+        )
+    }
+
+    override fun persistVoteAsGuest(voteDto: VoteDto, currentUser: GuestUser) {
+        voteRepository.save(
+                Vote(
+                        null,
+                        "guest_${currentUser.id}",
                         voteDto.ratedUserId,
                         voteDto.rating,
                         LocalDateTime.now()
