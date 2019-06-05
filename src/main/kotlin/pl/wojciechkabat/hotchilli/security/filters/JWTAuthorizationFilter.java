@@ -10,14 +10,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.CollectionUtils;
-import pl.wojciechkabat.hotchilli.entities.GuestUser;
 import pl.wojciechkabat.hotchilli.entities.Role;
 import pl.wojciechkabat.hotchilli.entities.User;
-import pl.wojciechkabat.hotchilli.repositories.GuestUserRepository;
 import pl.wojciechkabat.hotchilli.repositories.UserRepository;
-import pl.wojciechkabat.hotchilli.security.common.RoleEnum;
 import pl.wojciechkabat.hotchilli.security.token.JwtSettings;
-import pl.wojciechkabat.hotchilli.utils.EmailValidator;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -25,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +28,6 @@ import java.util.Optional;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final UserRepository userRepository;
-    private final GuestUserRepository guestUserRepository;
     private final JwtSettings jwtSettings;
 
     private static final String HEADER_STRING = "Authorization";
@@ -41,10 +35,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     public JWTAuthorizationFilter(AuthenticationManager authManager,
                                   UserRepository userRepository,
-                                  GuestUserRepository guestUserRepository, JwtSettings jwtSettings) {
+                                  JwtSettings jwtSettings) {
         super(authManager);
         this.userRepository = userRepository;
-        this.guestUserRepository = guestUserRepository;
         this.jwtSettings = jwtSettings;
     }
 
@@ -57,10 +50,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
         try {
-            final String subject = parseToken(token);
-            boolean isGuest = !EmailValidator.EmailValidator.validate(subject);
-            UsernamePasswordAuthenticationToken authentication = getAuthentication(subject, isGuest);
-            if (checkTokenWithUsersIdentity(subject, isGuest)) {
+            UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
+            if (checkTokenWithUsersIdentity(token)) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             chain.doFilter(req, res);
@@ -70,29 +61,24 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     }
 
-    private boolean checkTokenWithUsersIdentity(String subject, boolean isGuest) {
-        if (!isGuest) {
-            return userRepository.findByEmail(subject).isPresent();
-        } else {
-            return guestUserRepository.findByDeviceId(subject).isPresent();
-        }
+    private boolean checkTokenWithUsersIdentity(String token) {
+        final String subject = parseToken(token);
+        return userRepository.findByEmail(subject).isPresent();
     }
 
-    private UsernamePasswordAuthenticationToken getAuthentication(String subject, boolean isGuest) {
-        if (!isGuest) {
+    private UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        if (token != null) {
+            final String subject = parseToken(token);
             final Optional<User> applicationUser = userRepository.findByEmail(subject);
+
             if (applicationUser.isPresent() && !CollectionUtils.isEmpty(applicationUser.get().getRoles())) {
                 final User user = applicationUser.get();
                 final List<GrantedAuthority> grantedAuthorities = getGrantedAuthorities(user.getRoles());
-                return new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), grantedAuthorities);
+                if (subject != null) {
+                    return new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), grantedAuthorities);
+                }
             }
-        } else {
-            final Optional<GuestUser> guestUser = guestUserRepository.findByDeviceId(subject);
-            if (guestUser.isPresent()) {
-                final GuestUser user = guestUser.get();
-                final List<GrantedAuthority> grantedAuthorities = getGrantedAuthorities(Arrays.asList(new Role(12L, RoleEnum.GUEST)));
-                return new UsernamePasswordAuthenticationToken(user.getDeviceId(), null, grantedAuthorities);
-            }
+            return null;
         }
         return null;
     }

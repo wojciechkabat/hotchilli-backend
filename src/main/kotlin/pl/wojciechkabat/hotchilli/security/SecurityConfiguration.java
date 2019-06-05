@@ -13,8 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import pl.wojciechkabat.hotchilli.repositories.GuestUserRepository;
 import pl.wojciechkabat.hotchilli.repositories.UserRepository;
+import pl.wojciechkabat.hotchilli.security.common.RoleEnum;
 import pl.wojciechkabat.hotchilli.security.filters.JWTAuthenticationFilter;
 import pl.wojciechkabat.hotchilli.security.filters.JWTAuthorizationFilter;
 import pl.wojciechkabat.hotchilli.security.model.TokenService;
@@ -33,7 +33,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
-    private final GuestUserRepository guestUserRepository;
     private final ObjectMapper objectMapper;
     private final TokenService tokenService;
     private final JwtSettings jwtSettings;
@@ -46,12 +45,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public SecurityConfiguration(UserDetailsServiceImpl userDetailsService,
                                  BCryptPasswordEncoder bCryptPasswordEncoder,
                                  UserRepository userRepository,
-                                 GuestUserRepository guestUserRepository, ObjectMapper objectMapper,
+                                 ObjectMapper objectMapper,
                                  TokenService tokenService, JwtSettings jwtSettings) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
-        this.guestUserRepository = guestUserRepository;
         this.objectMapper = objectMapper;
         this.tokenService = tokenService;
         this.jwtSettings = jwtSettings;
@@ -67,7 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), userRepository, objectMapper, tokenService))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userRepository, guestUserRepository, jwtSettings))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userRepository, jwtSettings))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
