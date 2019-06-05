@@ -10,8 +10,8 @@ data class Vote(
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long?,
-        @Column(name = "voting_user_id", nullable = false)
-        val votingUserId: Long,
+        @Column(name = "voting_user_identifier", nullable = false)
+        val votingUserIdentifier: String,
         @Column(name = "rated_user_id", nullable = false)
         val ratedUserId: Long,
         @Column(name = "rating", nullable = false)
