@@ -40,7 +40,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String SIGN_UP_URL = "/registration";
     private static final String GET_NEW_ACCESS_TOKEN = "/api/auth/token/**";
     private static final String LOGIN = "/login";
-    private static final String LOGIN_GUEST = "/login/guest";
 
     public SecurityConfiguration(UserDetailsServiceImpl userDetailsService,
                                  BCryptPasswordEncoder bCryptPasswordEncoder,
@@ -61,7 +60,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, SIGN_UP_URL).permitAll()
                 .antMatchers(GET, GET_NEW_ACCESS_TOKEN).permitAll()
                 .antMatchers(POST, LOGIN).permitAll()
-                .antMatchers(POST, LOGIN_GUEST).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), userRepository, objectMapper, tokenService))

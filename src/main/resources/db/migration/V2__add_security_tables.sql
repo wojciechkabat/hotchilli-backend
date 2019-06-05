@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS refresh_tokens (
   id UUID PRIMARY KEY,
-	user_id BIGINT,
+	user_id BIGINT NOT NULL,
 	refresh_token varchar(512) NOT NULL,
 	device_id varchar(255) NOT NULL
 );
