@@ -20,7 +20,7 @@ class VotingController(
         voteService.persistVote(voteDto, currentUser)
     }
 
-    @PostMapping("/voting/guest")
+    @PostMapping("guest/voting")
     fun postVoteGuest(@RequestBody guestVoteDto: GuestVoteDto) {
         voteService.persistGuestVote(guestVoteDto)
     }

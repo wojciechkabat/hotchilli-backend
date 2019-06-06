@@ -6,11 +6,14 @@ import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.dtos.VoteDto
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.entities.Vote
+import pl.wojciechkabat.hotchilli.exceptions.GuestVoteLimitExceededException
 import pl.wojciechkabat.hotchilli.repositories.VoteRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
 class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
+    private val GUEST_VOTE_LIMIT: Int = 3
     override fun findVoteDataForUsers(userIds: List<Long>): List<VoteData> {
         return voteRepository.findVoteDataByUserIds(userIds)
     }
@@ -28,6 +31,12 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
     }
 
     override fun persistGuestVote(guestVoteDto: GuestVoteDto) {
+        val votesToday = voteRepository.findCountOfUserVotesAfterDate(guestVoteDto.deviceId, LocalDate.now().atStartOfDay())
+
+        if (votesToday >= GUEST_VOTE_LIMIT) {
+            throw GuestVoteLimitExceededException()
+        }
+
         voteRepository.save(
                 Vote(
                         null,

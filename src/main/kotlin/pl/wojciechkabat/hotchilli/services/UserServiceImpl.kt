@@ -16,7 +16,7 @@ import java.time.LocalDate
 @Service
 class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteService) : UserService {
     override fun provideRandomUsers(number: Int): List<UserDto> {
-        val randomUsers = userRepository.findRandomUsers(20)
+        val randomUsers = userRepository.findRandomUsers(number)
         val voteDataForUsers: Map<Long, VoteData> = voteService.findVoteDataForUsers(randomUsers.stream().map { it.id!! }.collect(toList()))
                 .associateBy({ it.userId }, { it })
 
