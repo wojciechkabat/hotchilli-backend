@@ -19,6 +19,9 @@ data class User(
         @Column(name = "username", nullable = false)
         val username: String,
 
+        @Column(name = "password")
+        val password: String,
+
         @Column(name = "birthday")
         val dateOfBirth: LocalDate,
 
@@ -32,8 +35,5 @@ data class User(
         @JoinTable(name = "user_roles",
                 joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")])
-        val roles: List<Role>,
-
-        @Column(name = "password")
-        val password: String
+        val roles: List<Role>
 )

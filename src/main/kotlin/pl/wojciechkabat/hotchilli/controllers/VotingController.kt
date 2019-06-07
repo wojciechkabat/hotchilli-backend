@@ -16,7 +16,7 @@ class VotingController(
 ) {
     @PostMapping("/voting")
     fun postVote(@RequestBody voteDto: VoteDto) {
-        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", LocalDate.now(), ArrayList(), ArrayList(), "Adsa")
+        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", "Adsa", LocalDate.now(), ArrayList(), ArrayList())
         voteService.persistVote(voteDto, currentUser)
     }
 

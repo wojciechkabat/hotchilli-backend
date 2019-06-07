@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
-import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
@@ -18,7 +17,7 @@ import pl.wojciechkabat.hotchilli.utils.Validators
 import javax.transaction.Transactional
 
 @Service
-class AccountServiceImpl (
+class AccountServiceImpl(
         private val userRepository: UserRepository,
         private val roleRepository: RoleRepository,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
@@ -27,8 +26,10 @@ class AccountServiceImpl (
 
     @Transactional
     override fun register(registrationDto: RegistrationDto) {
+        logger.info("Attempting to register user with email: ${registrationDto.email}")
+
         if (userRepository.findByEmail(registrationDto.email).isPresent) {
-            logger.error("Trying to create account with already existing email: " + registrationDto.email)
+            logger.error("Trying to create account with already existing email: ${registrationDto.email}")
             throw UserWithLoginAlreadyExistsException()
         }
 
@@ -40,14 +41,14 @@ class AccountServiceImpl (
                         null,
                         registrationDto.email,
                         registrationDto.username,
+                        bCryptPasswordEncoder.encode(registrationDto.password),
                         registrationDto.dateOfBirth,
                         PictureMapper.mapToEntity(registrationDto.pictures),
-                        listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
-                        bCryptPasswordEncoder.encode(registrationDto.password)
+                        listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() })))
                 )
         )
 
-        logger.info("Account created for user with email: " + registrationDto.email)
+        logger.info("Account created for user with email: ${registrationDto.email}")
     }
 
     private fun validateEmailFormat(email: String) {
