@@ -18,6 +18,16 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
         return voteRepository.findVoteDataByUserIds(userIds)
     }
 
+    override fun findVoteDataForUser(userId: Long): VoteData {
+        val optionalVoteData = voteRepository.findVoteDataByUserId(userId)
+        return if (optionalVoteData.isPresent) {
+            optionalVoteData.get()
+        } else {
+            VoteData(userId, 0.0, 0)
+
+        }
+    }
+
     override fun persistVote(voteDto: VoteDto, currentUser: User) {
         voteRepository.save(
                 Vote(

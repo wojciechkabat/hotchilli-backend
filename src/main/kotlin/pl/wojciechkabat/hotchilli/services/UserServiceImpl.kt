@@ -34,6 +34,18 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                 .collect(toList())
     }
 
+    override fun getUserDataFor(activeUser: User): UserDto {
+        val voteDataForUser = voteService.findVoteDataForUser(activeUser.id!!);
+        return UserDto(
+                activeUser.id,
+                activeUser.username,
+                calculateAge(activeUser.dateOfBirth),
+                PictureMapper.mapToDto(activeUser.pictures),
+                voteDataForUser.averageRating,
+                voteDataForUser.voteCount
+        )
+    }
+
     override fun findByEmail(email: String): User {
         return userRepository.findByEmail(email).orElseThrow(({ NoUserWithGivenEmailException() }))
     }
