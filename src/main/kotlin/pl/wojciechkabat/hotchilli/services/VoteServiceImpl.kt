@@ -8,11 +8,12 @@ import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.entities.Vote
 import pl.wojciechkabat.hotchilli.exceptions.GuestVoteLimitExceededException
 import pl.wojciechkabat.hotchilli.repositories.VoteRepository
+import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
-class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
+class VoteServiceImpl(val voteRepository: VoteRepository, val clock: Clock) : VoteService {
     private val GUEST_VOTE_LIMIT: Int = 3
     override fun findVoteDataForUsers(userIds: List<Long>): List<VoteData> {
         return voteRepository.findVoteDataByUserIds(userIds)
@@ -35,7 +36,7 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
                         currentUser.id.toString(),
                         voteDto.ratedUserId,
                         voteDto.rating,
-                        LocalDateTime.now()
+                        LocalDateTime.now(clock)
                 )
         )
     }
@@ -53,7 +54,7 @@ class VoteServiceImpl(val voteRepository: VoteRepository) : VoteService {
                         guestVoteDto.deviceId,
                         guestVoteDto.ratedUserId,
                         guestVoteDto.rating,
-                        LocalDateTime.now()
+                        LocalDateTime.now(clock)
                 )
         )
     }
