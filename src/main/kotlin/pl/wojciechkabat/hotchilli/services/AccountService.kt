@@ -6,5 +6,6 @@ import pl.wojciechkabat.hotchilli.entities.User
 
 interface AccountService {
     fun register(registrationDto: RegistrationDto)
-    fun addPicture(pictureDto: PictureDto, user: User)
+    fun addPicture(pictureDto: PictureDto, user: User): PictureDto
+    fun deletePicture(pictureId: Long, user: User)
 }

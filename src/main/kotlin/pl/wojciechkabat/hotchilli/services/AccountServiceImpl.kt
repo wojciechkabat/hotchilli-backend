@@ -7,21 +7,21 @@ import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
 import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
-import pl.wojciechkabat.hotchilli.exceptions.NoSuchRoleInDbException
-import pl.wojciechkabat.hotchilli.exceptions.UserWithLoginAlreadyExistsException
+import pl.wojciechkabat.hotchilli.exceptions.*
+import pl.wojciechkabat.hotchilli.repositories.PictureRepository
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import pl.wojciechkabat.hotchilli.utils.Validators
+import java.lang.RuntimeException
 import javax.transaction.Transactional
 
 @Service
 class AccountServiceImpl(
         private val userRepository: UserRepository,
         private val roleRepository: RoleRepository,
+        private val pictureRepository: PictureRepository,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : AccountService {
     private val logger = LoggerFactory.getLogger(AccountService::class.java)
@@ -62,8 +62,18 @@ class AccountServiceImpl(
     }
 
     @Transactional
-    override fun addPicture(pictureDto: PictureDto, user: User) {
-        user.addPicture(Picture(null, pictureDto.externalIdentifier, pictureDto.url, user))
+    override fun addPicture(pictureDto: PictureDto, user: User): PictureDto{
+        val persistedPicture = pictureRepository.save(Picture(null, pictureDto.externalIdentifier, pictureDto.url, user))
+        user.addPicture(persistedPicture)
+        return PictureMapper.mapToDto(persistedPicture)
+    }
+
+    override fun deletePicture(pictureId: Long, user: User) {
+        if(user.pictures.stream().noneMatch {picture -> pictureId.equals(picture.id)}) {
+            throw UserDoesNotOwnResourceException()
+        }
+        pictureRepository.deleteById(pictureId)
+        //fixme add removing from cloudinary too
     }
 
     private fun validateEmailFormat(email: String) {

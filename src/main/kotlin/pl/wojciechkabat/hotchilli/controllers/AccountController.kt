@@ -19,9 +19,14 @@ class AccountController(
     }
 
     @PostMapping("/pictures")
-    fun addPicture(principal: Principal, @RequestBody pictureDto: PictureDto) {
+    fun addPicture(principal: Principal, @RequestBody pictureDto: PictureDto): PictureDto{
         val activeUser = securityService.retrieveActiveUser(principal)
-        accountService.addPicture(pictureDto, activeUser)
+        return accountService.addPicture(pictureDto, activeUser)
     }
 
+    @DeleteMapping("/pictures/{id}")
+    fun deletePicture(principal: Principal, @PathVariable("id") pictureId: Long) {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        return accountService.deletePicture(pictureId, activeUser)
+    }
 }
