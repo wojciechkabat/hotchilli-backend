@@ -61,23 +61,30 @@ class AccountServiceImplTest {
         )
 
         Mockito.verify(userRepository, times(1)).save(userArgumentCaptor.capture())
-        assertThat(userArgumentCaptor.value).isEqualTo(
-                User(
+
+
+        val expectedUser = User(
+                id =null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = dateOfBirth,
+                roles = listOf(userRole)
+        )
+
+        expectedUser.pictures = mutableListOf(
+                Picture(
                         null,
-                        "some@email.com",
-                        "someUserName",
-                        "encodedPassword",
-                        dateOfBirth,
-                        listOf(
-                                Picture(
-                                      null,
-                                        "externalIdentifier",
-                                        "http://url"
-                                )
-                        ),
-                        listOf(userRole)
+                        "externalIdentifier",
+                        "http://url",
+                        expectedUser
                 )
         )
+
+        assertThat(userArgumentCaptor.value).isEqualToIgnoringGivenFields(
+                expectedUser, "pictures"
+        )
+        assertThat(userArgumentCaptor.value.pictures.size).isEqualTo(1)
     }
 
     @Test(expected = UserWithLoginAlreadyExistsException::class)

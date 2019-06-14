@@ -2,6 +2,7 @@ package pl.wojciechkabat.hotchilli.utils
 
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.entities.Picture
+import pl.wojciechkabat.hotchilli.entities.User
 import java.util.stream.Collectors.toList as toList
 
 class PictureMapper()  {
@@ -14,11 +15,12 @@ class PictureMapper()  {
             )
         }
 
-        fun mapToEntity(pictureDto: PictureDto): Picture {
+        fun mapToEntity(pictureDto: PictureDto, owner: User): Picture {
             return Picture(
                     pictureDto.id,
                     pictureDto.externalIdentifier,
-                    pictureDto.url
+                    pictureDto.url,
+                    owner
             )
         }
 
@@ -26,8 +28,8 @@ class PictureMapper()  {
             return pictureEntities.stream().map { mapToDto(it) }.collect(toList())
         }
 
-        fun mapToEntity(pictureDtos: List<PictureDto>): List<Picture> {
-            return pictureDtos.stream().map { mapToEntity(it) }.collect(toList())
+        fun mapToEntity(pictureDtos: List<PictureDto>, owner: User): MutableList<Picture> {
+            return pictureDtos.stream().map { mapToEntity(it, owner) }.collect(toList())
         }
     }
 

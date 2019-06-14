@@ -3,7 +3,9 @@ package pl.wojciechkabat.hotchilli.services
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
+import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
@@ -36,19 +38,32 @@ class AccountServiceImpl(
         validateEmailFormat(registrationDto.email)
         validatePasswordFormat(registrationDto.password)
 
-        userRepository.save(
-                User(
-                        null,
-                        registrationDto.email,
-                        registrationDto.username,
-                        bCryptPasswordEncoder.encode(registrationDto.password),
-                        registrationDto.dateOfBirth,
-                        PictureMapper.mapToEntity(registrationDto.pictures),
-                        listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() })))
-                )
+        val user = User(
+                id = null,
+                email = registrationDto.email,
+                username = registrationDto.username,
+                password = bCryptPasswordEncoder.encode(registrationDto.password),
+                dateOfBirth = registrationDto.dateOfBirth,
+                roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() })))
         )
 
+        if(registrationDto.pictures.isNotEmpty()) {
+            registrationDto.pictures.stream().forEach { picture -> user.addPicture(
+                    Picture(null,
+                            picture.externalIdentifier,
+                            picture.url,
+                            user
+                    ))}
+        }
+
+        userRepository.save(user)
+
         logger.info("Account created for user with email: ${registrationDto.email}")
+    }
+
+    @Transactional
+    override fun addPicture(pictureDto: PictureDto, user: User) {
+        user.addPicture(Picture(null, pictureDto.externalIdentifier, pictureDto.url, user))
     }
 
     private fun validateEmailFormat(email: String) {
