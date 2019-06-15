@@ -11,17 +11,17 @@ public class CloudinaryConstants {
     public static String CLOUDINARY_API_KEY;
     public static String CLOUDINARY_API_SECRET;
 
-    @Value("${giftbox.cloudinary.cloudname}")
+    @Value("${hotchilli.cloudinary.cloudname}")
     public void setCloudinaryCloudName(String cloudinaryCloudName) {
         CLOUDINARY_CLOUD_NAME = cloudinaryCloudName;
     }
 
-    @Value("${giftbox.cloudinary.apiKey}")
+    @Value("${hotchilli.cloudinary.apiKey}")
     public void setCloudinaryApiKey(String cloudinaryApiKey) {
         CLOUDINARY_API_KEY = cloudinaryApiKey;
     }
 
-    @Value("${giftbox.cloudinary.apiSecret}")
+    @Value("${hotchilli.cloudinary.apiSecret}")
     public void setCloudinaryApiSecret(String cloudinaryApiSecret) {
         CLOUDINARY_API_SECRET = cloudinaryApiSecret;
     }
