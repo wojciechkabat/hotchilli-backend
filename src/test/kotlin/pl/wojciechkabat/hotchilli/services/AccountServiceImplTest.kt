@@ -29,6 +29,8 @@ class AccountServiceImplTest {
     @Mock
     lateinit var roleRepository: RoleRepository
     @Mock
+    lateinit var pictureService: PictureService
+    @Mock
     lateinit var bCryptPasswordEncoder: BCryptPasswordEncoder
     @InjectMocks
     lateinit var accountServiceImpl: AccountServiceImpl

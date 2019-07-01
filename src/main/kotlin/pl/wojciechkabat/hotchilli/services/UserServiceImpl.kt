@@ -27,6 +27,7 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                             it.id,
                             it.username,
                             calculateAge(it.dateOfBirth),
+                            it.dateOfBirth,
                             PictureMapper.mapToDto(it.pictures),
                             voteData.averageRating,
                             voteData.voteCount)
@@ -40,6 +41,7 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                 activeUser.id,
                 activeUser.username,
                 calculateAge(activeUser.dateOfBirth),
+                activeUser.dateOfBirth,
                 PictureMapper.mapToDto(activeUser.pictures),
                 voteDataForUser.averageRating,
                 voteDataForUser.voteCount
