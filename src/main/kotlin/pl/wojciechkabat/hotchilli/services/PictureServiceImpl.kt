@@ -10,6 +10,7 @@ import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.exceptions.NoPictureWithGivenIdException
 import pl.wojciechkabat.hotchilli.repositories.PictureRepository
+import javax.transaction.Transactional
 import kotlin.collections.HashMap
 
 @Service
@@ -24,10 +25,12 @@ class PictureServiceImpl(
     )
     private val LOG = LoggerFactory.getLogger(PictureService::class.java)
 
+    @Transactional
     override fun savePicture(pictureDto: PictureDto, user: User): Picture {
         return pictureRepository.save(Picture(null, pictureDto.externalIdentifier, pictureDto.url, user))
     }
 
+    @Transactional
     override fun deleteById(pictureId: Long) {
         val picture = pictureRepository.findById(pictureId).orElseThrow(({ NoPictureWithGivenIdException() }))
         if (picture.externalIdentifier != null) {
@@ -42,6 +45,7 @@ class PictureServiceImpl(
             cloudinary.api().deleteResources(listOf(externalPictureId), HashMap<String, String>())
         } catch (e: Exception) {
             LOG.error("Cloudinary error - Could not delete image with id: $externalPictureId")
+            throw e
         }
     }
 }

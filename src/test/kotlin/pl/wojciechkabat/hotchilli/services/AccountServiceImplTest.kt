@@ -13,6 +13,7 @@ import pl.wojciechkabat.hotchilli.entities.Role
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
+import pl.wojciechkabat.hotchilli.exceptions.UserDoesNotOwnResourceException
 import pl.wojciechkabat.hotchilli.exceptions.UserWithLoginAlreadyExistsException
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
@@ -130,6 +131,65 @@ class AccountServiceImplTest {
                         ArrayList(),
                         LocalDate.now())
         )
+    }
+
+    @Test
+    fun shouldAddUserPicture() {
+        val user = User(
+                id =null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER))
+        )
+
+        val pictureDto = PictureDto(
+                null,
+                "someExternalIdentifier",
+                "http://url1"
+        )
+
+        Mockito.`when`(pictureService.savePicture(pictureDto, user)).thenReturn(Picture(12L, "someExternalIdentifier", "http://url1", user))
+
+        accountServiceImpl.addPicture(pictureDto, user)
+
+        Mockito.verify(pictureService, times(1)).savePicture(pictureDto, user)
+        assertThat(user.pictures.size).isEqualTo(1)
+    }
+
+    @Test
+    fun shouldDeleteUserPicture() {
+        val user = User(
+                id =null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER))
+        )
+
+        user.pictures.add(Picture(123L, "asd", "asda", user))
+
+        accountServiceImpl.deletePicture(123L, user)
+
+        Mockito.verify(pictureService, times(1)).deleteById(123L)
+    }
+
+    @Test(expected = UserDoesNotOwnResourceException::class)
+    fun shouldThrowExceptionIfUserDoesNotOwnPictureWhenDeletingUserPicture() {
+        val user = User(
+                id =null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER))
+        )
+
+        accountServiceImpl.deletePicture(123L, user)
+
+        Mockito.verify(pictureService, times(1)).deleteById(123L)
     }
 
     private fun mockUserEntity(email: String): User {

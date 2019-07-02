@@ -61,7 +61,7 @@ class AccountServiceImpl(
     }
 
     @Transactional
-    override fun addPicture(pictureDto: PictureDto, user: User): PictureDto{
+    override fun addPicture(pictureDto: PictureDto, user: User): PictureDto {
         val persistedPicture = pictureService.savePicture(pictureDto, user)
         user.addPicture(persistedPicture)
         return PictureMapper.mapToDto(persistedPicture)
