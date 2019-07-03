@@ -43,7 +43,8 @@ class AccountServiceImpl(
                 username = registrationDto.username,
                 password = bCryptPasswordEncoder.encode(registrationDto.password),
                 dateOfBirth = registrationDto.dateOfBirth,
-                roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() })))
+                roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
+                gender = registrationDto.gender
         )
 
         if(registrationDto.pictures.isNotEmpty()) {

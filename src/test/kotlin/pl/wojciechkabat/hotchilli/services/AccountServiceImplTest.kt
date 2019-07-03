@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
+import pl.wojciechkabat.hotchilli.entities.Gender
 import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.Role
 import pl.wojciechkabat.hotchilli.entities.User
@@ -59,7 +60,8 @@ class AccountServiceImplTest {
                                         "http://url"
                                 )
                         ),
-                        dateOfBirth
+                        dateOfBirth,
+                        Gender.MALE
                 )
         )
 
@@ -72,7 +74,8 @@ class AccountServiceImplTest {
                 username = "someUserName",
                 password = "encodedPassword",
                 dateOfBirth = dateOfBirth,
-                roles = listOf(userRole)
+                roles = listOf(userRole),
+                gender = Gender.MALE
         )
 
         expectedUser.pictures = mutableListOf(
@@ -102,7 +105,9 @@ class AccountServiceImplTest {
                         "somePassword",
                         "someUserName",
                         ArrayList(),
-                        LocalDate.now())
+                        LocalDate.now(),
+                        gender = Gender.MALE
+                )
         )
     }
 
@@ -116,7 +121,9 @@ class AccountServiceImplTest {
                         "somePassword",
                         "someUserName",
                         ArrayList(),
-                        LocalDate.now())
+                        LocalDate.now(),
+                        gender = Gender.MALE
+                )
         )
     }
 
@@ -129,7 +136,9 @@ class AccountServiceImplTest {
                         incorrectlyFormattedPassword,
                         "someUserName",
                         ArrayList(),
-                        LocalDate.now())
+                        LocalDate.now(),
+                        gender = Gender.MALE
+                )
         )
     }
 
@@ -141,7 +150,8 @@ class AccountServiceImplTest {
                 username = "someUserName",
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER))
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE
         )
 
         val pictureDto = PictureDto(
@@ -166,7 +176,8 @@ class AccountServiceImplTest {
                 username = "someUserName",
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER))
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE
         )
 
         user.pictures.add(Picture(123L, "asd", "asda", user))
@@ -184,7 +195,8 @@ class AccountServiceImplTest {
                 username = "someUserName",
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER))
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE
         )
 
         accountServiceImpl.deletePicture(123L, user)
@@ -200,7 +212,8 @@ class AccountServiceImplTest {
                 "somePassword",
                 LocalDate.now(),
                 ArrayList(),
-                ArrayList()
+                ArrayList(),
+                gender = Gender.MALE
         )
     }
 }

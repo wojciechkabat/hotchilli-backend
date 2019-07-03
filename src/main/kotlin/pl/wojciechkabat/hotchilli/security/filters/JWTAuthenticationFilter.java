@@ -22,6 +22,7 @@ import pl.wojciechkabat.hotchilli.security.model.TokenService;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.setContentType(MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(res.getWriter(), tokenMap);
     }
-
 
     private List<GrantedAuthority> getGrantedAuthorities(LoginUserDto credentials) {
         final Optional<User> applicationUser = userRepository.findByEmail(credentials.getLogin());

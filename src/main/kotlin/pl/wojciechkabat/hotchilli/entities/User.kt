@@ -7,6 +7,10 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "users")
+@NamedEntityGraphs(
+        NamedEntityGraph(name = "User.eagerRoles", attributeNodes = [NamedAttributeNode("roles")]),
+        NamedEntityGraph(name = "User.eagerPictures", attributeNodes = [NamedAttributeNode("pictures")])
+)
 data class User(
         @Id
         @Column(name = "id")
@@ -29,12 +33,16 @@ data class User(
         @Cascade(CascadeType.ALL)
         var pictures: MutableList<Picture> = ArrayList(),
 
-        @ManyToMany(fetch = FetchType.EAGER)
+        @ManyToMany
         @Cascade(CascadeType.ALL)
         @JoinTable(name = "user_roles",
                 joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")])
-        var roles: List<Role>
+        var roles: List<Role>,
+
+        @Column(name = "gender")
+        @Enumerated(EnumType.STRING)
+        var gender: Gender
 ) {
     fun addPicture(picture: Picture) {
         pictures.add(picture)
