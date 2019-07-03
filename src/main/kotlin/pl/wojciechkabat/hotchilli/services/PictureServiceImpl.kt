@@ -32,17 +32,21 @@ class PictureServiceImpl(
 
     @Transactional
     override fun deleteById(pictureId: Long) {
+        LOG.info("Attempting to delete picture with db id: $pictureId")
+
         val picture = pictureRepository.findById(pictureId).orElseThrow(({ NoPictureWithGivenIdException() }))
         if (picture.externalIdentifier != null) {
             deleteFromRemoteServerByExternalId(picture.externalIdentifier)
         }
-        pictureRepository.deleteById(pictureId)
+        pictureRepository.delete(picture)
+        LOG.info("Deleted picture with db id: $pictureId")
     }
 
     private fun deleteFromRemoteServerByExternalId(externalPictureId: String) {
         LOG.info("Cloudinary - Attempting to delete picture with id: $externalPictureId")
         try {
             cloudinary.api().deleteResources(listOf(externalPictureId), HashMap<String, String>())
+            LOG.info("Cloudinary - Deleted picture with id: $externalPictureId")
         } catch (e: Exception) {
             LOG.error("Cloudinary error - Could not delete image with id: $externalPictureId")
             throw e

@@ -30,7 +30,7 @@ data class User(
         var dateOfBirth: LocalDate,
 
         @OneToMany(mappedBy = "owner")
-        @Cascade(CascadeType.ALL)
+        @Cascade(CascadeType.MERGE)
         var pictures: MutableList<Picture> = ArrayList(),
 
         @ManyToMany

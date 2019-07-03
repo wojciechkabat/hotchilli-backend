@@ -1,5 +1,6 @@
 package pl.wojciechkabat.hotchilli.dtos
 
+import pl.wojciechkabat.hotchilli.entities.Gender
 import java.time.LocalDate
 
 data class UserDto (
@@ -9,5 +10,6 @@ data class UserDto (
         val dateOfBirth: LocalDate,
         val pictures: List<PictureDto>,
         val averageRating: Double,
-        val voteCount: Long
+        val voteCount: Long,
+        val gender: Gender
 )

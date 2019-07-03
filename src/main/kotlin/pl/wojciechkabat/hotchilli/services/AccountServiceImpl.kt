@@ -68,7 +68,6 @@ class AccountServiceImpl(
         return PictureMapper.mapToDto(persistedPicture)
     }
 
-    @Transactional
     override fun deletePicture(pictureId: Long, user: User) {
         if(user.pictures.stream().noneMatch {picture -> pictureId == picture.id }) {
             throw UserDoesNotOwnResourceException()

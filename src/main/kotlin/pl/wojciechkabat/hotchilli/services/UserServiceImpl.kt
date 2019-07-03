@@ -1,6 +1,7 @@
 package pl.wojciechkabat.hotchilli.services
 
 import org.springframework.stereotype.Service
+import pl.wojciechkabat.hotchilli.dtos.UpdateUserDto
 import pl.wojciechkabat.hotchilli.dtos.UserDto
 import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.entities.GenderDisplayOption
@@ -13,6 +14,7 @@ import java.time.Period
 import java.time.LocalDate
 import java.util.*
 import java.util.stream.Collectors.toSet
+import javax.transaction.Transactional
 
 @Service
 class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteService, val random: Random) : UserService {
@@ -41,22 +43,33 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                             it.dateOfBirth,
                             PictureMapper.mapToDto(it.pictures),
                             voteData.averageRating,
-                            voteData.voteCount)
+                            voteData.voteCount,
+                            it.gender)
                 }
                 .collect(toList())
     }
 
-    override fun getUserDataFor(activeUser: User): UserDto {
-        val voteDataForUser = voteService.findVoteDataForUser(activeUser.id!!);
+    override fun getUserDataFor(user: User): UserDto {
+        val voteDataForUser = voteService.findVoteDataForUser(user.id!!)
         return UserDto(
-                activeUser.id,
-                activeUser.username,
-                calculateAge(activeUser.dateOfBirth),
-                activeUser.dateOfBirth,
-                PictureMapper.mapToDto(activeUser.pictures),
+                user.id,
+                user.username,
+                calculateAge(user.dateOfBirth),
+                user.dateOfBirth,
+                PictureMapper.mapToDto(user.pictures),
                 voteDataForUser.averageRating,
-                voteDataForUser.voteCount
+                voteDataForUser.voteCount,
+                user.gender
         )
+    }
+
+    @Transactional
+    override fun updateUserDataFor(user: User, updateUserDto: UpdateUserDto): UserDto {
+        user.username = updateUserDto.username
+        user.gender = updateUserDto.gender
+        user.dateOfBirth = updateUserDto.dateOfBirth
+
+        return getUserDataFor(user)
     }
 
     override fun findByEmail(email: String): User {

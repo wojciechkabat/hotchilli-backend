@@ -1,6 +1,7 @@
 package pl.wojciechkabat.hotchilli.controllers
 
 import org.springframework.web.bind.annotation.*
+import pl.wojciechkabat.hotchilli.dtos.UpdateUserDto
 import pl.wojciechkabat.hotchilli.dtos.UserDto
 import pl.wojciechkabat.hotchilli.entities.GenderDisplayOption
 import pl.wojciechkabat.hotchilli.services.SecurityService
@@ -17,6 +18,12 @@ class UserController(
     fun getInfoForCurrentUser(principal: Principal): UserDto {
         val activeUser = securityService.retrieveActiveUser(principal)
         return userService.getUserDataFor(activeUser)
+    }
+
+    @PutMapping("users/me")
+    fun updateUserData(principal: Principal, @RequestBody updateUserDto: UpdateUserDto): UserDto {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        return userService.updateUserDataFor(activeUser, updateUserDto)
     }
 
     @GetMapping("/users/random")
