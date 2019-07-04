@@ -17,7 +17,7 @@ import kotlin.collections.HashMap
 class PictureServiceImpl(
         private val pictureRepository: PictureRepository
 ) : PictureService {
-    private var cloudinary: Cloudinary = Cloudinary(
+    private val cloudinary: Cloudinary = Cloudinary(
             asMap(
                     "cloud_name", CLOUDINARY_CLOUD_NAME,
                     "api_key", CLOUDINARY_API_KEY,

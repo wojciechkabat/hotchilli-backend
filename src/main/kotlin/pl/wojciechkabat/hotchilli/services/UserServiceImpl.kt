@@ -89,7 +89,8 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
             excludedIds = excludedIds.plus(activeUserId)
         }
 
-        return random.longs(200, 1L, maxUserId)
+        return random.longs(200L + excludedIds.size, 1L, maxUserId + 1)
+                .distinct()
                 .boxed()
                 .filter {!excludedIds.contains(it)}
                 .limit(100)
