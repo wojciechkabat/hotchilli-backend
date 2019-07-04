@@ -23,6 +23,7 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
 
     private final val RANDOM_USERS_BATCH_SIZE = 20L
 
+    @Transactional
     override fun provideRandomUsers(genderDisplayOption: GenderDisplayOption, requestingUserIdentifier: String): List<UserDto> {
         val usersToReturn = provideRandomUserBatch(genderDisplayOption, requestingUserIdentifier)
 
