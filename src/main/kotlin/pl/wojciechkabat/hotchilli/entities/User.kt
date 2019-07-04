@@ -3,6 +3,7 @@ package pl.wojciechkabat.hotchilli.entities
 import org.hibernate.annotations.Cascade
 import org.hibernate.annotations.CascadeType
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
@@ -42,7 +43,10 @@ data class User(
 
         @Column(name = "gender")
         @Enumerated(EnumType.STRING)
-        var gender: Gender
+        var gender: Gender,
+
+        @Column(name = "created_at")
+        var createdAt: LocalDateTime
 ) {
     fun addPicture(picture: Picture) {
         pictures.add(picture)

@@ -7,6 +7,7 @@ import pl.wojciechkabat.hotchilli.entities.Gender
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.services.VoteService
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,7 +18,7 @@ class VotingController(
 ) {
     @PostMapping("/voting")
     fun postVote(@RequestBody voteDto: VoteDto) {
-        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", "Adsa", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE)
+        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", "Adsa", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, LocalDateTime.now())
         voteService.persistVote(voteDto, currentUser)
     }
 

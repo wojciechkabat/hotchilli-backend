@@ -103,7 +103,8 @@ class VoteServiceImplTest {
                 LocalDate.now(),
                 ArrayList(),
                 ArrayList(),
-                gender = Gender.MALE
+                Gender.MALE,
+                LocalDateTime.now()
         )
     }
 }

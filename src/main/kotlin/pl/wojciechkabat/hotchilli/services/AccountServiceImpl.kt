@@ -14,6 +14,7 @@ import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import pl.wojciechkabat.hotchilli.utils.Validators
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -44,7 +45,8 @@ class AccountServiceImpl(
                 password = bCryptPasswordEncoder.encode(registrationDto.password),
                 dateOfBirth = registrationDto.dateOfBirth,
                 roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
-                gender = registrationDto.gender
+                gender = registrationDto.gender,
+                createdAt = LocalDateTime.now()
         )
 
         if(registrationDto.pictures.isNotEmpty()) {

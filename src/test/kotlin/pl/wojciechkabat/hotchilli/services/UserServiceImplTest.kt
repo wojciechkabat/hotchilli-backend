@@ -11,6 +11,7 @@ import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.LongStream
@@ -76,9 +77,9 @@ class UserServiceImplTest {
         Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 10L, 30L, 31L, 45L))
         Mockito.`when`(userRepository.findUsersByIdIn(expectedFilteredOutUserIds)).thenReturn(
                 listOf(
-                        User(12L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE),
-                        User(31L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE),
-                        User(45L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE)
+                        User(12L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, createdAt = LocalDateTime.now()),
+                        User(31L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now()),
+                        User(45L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now())
                 )
         )
 
@@ -118,7 +119,8 @@ class UserServiceImplTest {
                 LocalDate.now(),
                 java.util.ArrayList(),
                 java.util.ArrayList(),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
     }
 

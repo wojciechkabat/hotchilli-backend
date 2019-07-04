@@ -20,6 +20,7 @@ import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 import org.assertj.core.api.Assertions.assertThat as assertThat;
@@ -75,7 +76,8 @@ class AccountServiceImplTest {
                 password = "encodedPassword",
                 dateOfBirth = dateOfBirth,
                 roles = listOf(userRole),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
 
         expectedUser.pictures = mutableListOf(
@@ -151,7 +153,8 @@ class AccountServiceImplTest {
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
                 roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
 
         val pictureDto = PictureDto(
@@ -177,7 +180,8 @@ class AccountServiceImplTest {
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
                 roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
 
         user.pictures.add(Picture(123L, "asd", "asda", user))
@@ -196,7 +200,8 @@ class AccountServiceImplTest {
                 password = "encodedPassword",
                 dateOfBirth = LocalDate.now(),
                 roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
 
         accountServiceImpl.deletePicture(123L, user)
@@ -213,7 +218,8 @@ class AccountServiceImplTest {
                 LocalDate.now(),
                 ArrayList(),
                 ArrayList(),
-                gender = Gender.MALE
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
         )
     }
 }
