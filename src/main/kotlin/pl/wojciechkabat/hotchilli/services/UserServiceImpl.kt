@@ -1,5 +1,6 @@
 package pl.wojciechkabat.hotchilli.services
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.UpdateUserDto
 import pl.wojciechkabat.hotchilli.dtos.UserDto
@@ -18,16 +19,12 @@ import javax.transaction.Transactional
 
 @Service
 class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteService, val random: Random) : UserService {
+    private val logger = LoggerFactory.getLogger(UserService::class.java)
+
     private final val RANDOM_USERS_BATCH_SIZE = 20L
 
     override fun provideRandomUsers(genderDisplayOption: GenderDisplayOption, requestingUserIdentifier: String): List<UserDto> {
-        val idsToFetch = getRandomUserIdsNotVotedForBefore(requestingUserIdentifier)
-        val randomUsers = userRepository.findUsersByIdIn(idsToFetch)
-
-        val usersToReturn = randomUsers.stream()
-                .filter{genderDisplayOption == GenderDisplayOption.ALL || it.gender.name == genderDisplayOption.name}
-                .limit(RANDOM_USERS_BATCH_SIZE)
-                .collect(toList())
+        val usersToReturn = provideRandomUserBatch(genderDisplayOption, requestingUserIdentifier)
 
         val voteDataForUsers: Map<Long, VoteData> = voteService.findVoteDataForUsers(
                 usersToReturn.stream().map { it.id!! }.collect(toList())
@@ -78,6 +75,28 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
 
     private fun calculateAge(birthDate: LocalDate): Int {
         return Period.between(birthDate, LocalDate.now()).years
+    }
+
+    private fun provideRandomUserBatch(genderDisplayOption: GenderDisplayOption, requestingUserIdentifier: String): List<User> {
+        var randomUserBatch = fetchRandomUserBatch(genderDisplayOption, requestingUserIdentifier)
+
+        if (randomUserBatch.isEmpty()) { //repeat once if empty to make sure
+            logger.info("First fetch returned 0 matching users, retrying")
+            randomUserBatch = fetchRandomUserBatch(genderDisplayOption, requestingUserIdentifier)
+            logger.info("Second fetch returned ${randomUserBatch.size} users")
+        }
+
+        return randomUserBatch
+    }
+
+    private fun fetchRandomUserBatch(genderDisplayOption: GenderDisplayOption, requestingUserIdentifier: String): List<User> {
+        val idsToFetch = getRandomUserIdsNotVotedForBefore(requestingUserIdentifier)
+        val randomUsers = userRepository.findUsersByIdIn(idsToFetch)
+
+        return randomUsers.stream()
+                .filter{genderDisplayOption == GenderDisplayOption.ALL || it.gender.name == genderDisplayOption.name}
+                .limit(RANDOM_USERS_BATCH_SIZE)
+                .collect(toList())
     }
 
     private fun getRandomUserIdsNotVotedForBefore(requestingUserIdentifier: String): Set<Long> {

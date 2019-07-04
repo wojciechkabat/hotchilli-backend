@@ -1,7 +1,6 @@
 package pl.wojciechkabat.hotchilli.services
 
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.*
@@ -36,7 +35,8 @@ class UserServiceImplTest {
 
         Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
         Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
-        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(LongStream.of(12L, 13L, 10L, 30L))
+        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 13L, 10L, 30L))
+        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(mockUserEntity(12L)))
 
         userService.provideRandomUsers(GenderDisplayOption.MALE, requestingUserIdentifier)
 
@@ -53,7 +53,8 @@ class UserServiceImplTest {
 
         Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
         Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
-        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(LongStream.of(12L, 1L))
+        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 1L))
+        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(mockUserEntity(12L)))
 
         userService.provideRandomUsers(GenderDisplayOption.MALE, requestingUserIdentifier)
 
@@ -72,7 +73,7 @@ class UserServiceImplTest {
 
         Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
         Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
-        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(LongStream.of(12L, 10L, 30L, 31L, 45L))
+        Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 10L, 30L, 31L, 45L))
         Mockito.`when`(userRepository.findUsersByIdIn(expectedFilteredOutUserIds)).thenReturn(
                 listOf(
                         User(12L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE),
@@ -86,4 +87,39 @@ class UserServiceImplTest {
         assertThat(providedUsersIds).contains(12L)
         assertThat(providedUsersIds).doesNotContain(31L, 45L)
     }
+
+    @Test
+    fun shouldRetryProcessIfThereAreNoRandomUsersToReturnAndReturnEmptyAfterSecondAttempt() {
+        val requestingUserIdentifier = "1"
+        val idsOfUsersAlreadyVotedFor = setOf(10L, 20L, 30L, 40L)
+        val expectedFilteredOutUserIds = emptySet<Long>()
+
+        Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
+        Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
+        doAnswer { generateLongStreamOf(12L, 13L, 10L, 30L) }.`when`(random).longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())
+        Mockito.`when`(userRepository.findUsersByIdIn(expectedFilteredOutUserIds)).thenReturn(emptyList())
+
+        val providedUsers = userService.provideRandomUsers(GenderDisplayOption.MALE, requestingUserIdentifier)
+
+        Mockito.verify(userRepository, times(2)).findUsersByIdIn(any())
+        assertThat(providedUsers).isEmpty()
+    }
+
+    private fun generateLongStreamOf(vararg longs: Long): LongStream {
+        return LongStream.of(*longs)
+    }
+
+    private fun mockUserEntity(id: Long): User {
+        return User(
+                id,
+                "someEmail@pl.pl",
+                "someUserName",
+                "somePassword",
+                LocalDate.now(),
+                java.util.ArrayList(),
+                java.util.ArrayList(),
+                gender = Gender.MALE
+        )
+    }
+
 }
