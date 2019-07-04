@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner
 import pl.wojciechkabat.hotchilli.dtos.GuestVoteDto
 import pl.wojciechkabat.hotchilli.dtos.VoteData
 import pl.wojciechkabat.hotchilli.dtos.VoteDto
+import pl.wojciechkabat.hotchilli.entities.Gender
 import pl.wojciechkabat.hotchilli.entities.User
 import pl.wojciechkabat.hotchilli.entities.Vote
 import pl.wojciechkabat.hotchilli.exceptions.GuestVoteLimitExceededException
@@ -101,7 +102,8 @@ class VoteServiceImplTest {
                 "somePassword",
                 LocalDate.now(),
                 ArrayList(),
-                ArrayList()
+                ArrayList(),
+                gender = Gender.MALE
         )
     }
 }

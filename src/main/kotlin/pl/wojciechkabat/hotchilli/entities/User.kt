@@ -7,6 +7,10 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "users")
+@NamedEntityGraphs(
+        NamedEntityGraph(name = "User.eagerRoles", attributeNodes = [NamedAttributeNode("roles")]),
+        NamedEntityGraph(name = "User.eagerPictures", attributeNodes = [NamedAttributeNode("pictures")])
+)
 data class User(
         @Id
         @Column(name = "id")
@@ -14,26 +18,34 @@ data class User(
         val id: Long?,
 
         @Column(name = "email", nullable = false)
-        val email: String,
+        var email: String,
 
         @Column(name = "username", nullable = false)
-        val username: String,
+        var username: String,
 
         @Column(name = "password")
-        val password: String,
+        var password: String,
 
         @Column(name = "birthday")
-        val dateOfBirth: LocalDate,
+        var dateOfBirth: LocalDate,
 
-        @OneToMany
-        @Cascade(CascadeType.ALL)
-        @JoinColumn(name = "user_id", referencedColumnName = "id")
-        val pictures: List<Picture>,
+        @OneToMany(mappedBy = "owner")
+        @Cascade(CascadeType.MERGE)
+        var pictures: MutableList<Picture> = ArrayList(),
 
-        @ManyToMany(fetch = FetchType.EAGER)
+        @ManyToMany
         @Cascade(CascadeType.ALL)
         @JoinTable(name = "user_roles",
                 joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")])
-        val roles: List<Role>
-)
+        var roles: List<Role>,
+
+        @Column(name = "gender")
+        @Enumerated(EnumType.STRING)
+        var gender: Gender
+) {
+    fun addPicture(picture: Picture) {
+        pictures.add(picture)
+        picture.owner = this
+    }
+}

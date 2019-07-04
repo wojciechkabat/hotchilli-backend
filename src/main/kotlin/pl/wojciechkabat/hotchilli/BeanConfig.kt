@@ -4,8 +4,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.time.Clock
-import java.time.Clock.systemDefaultZone
-
+import java.util.*
 
 
 @Configuration
@@ -18,5 +17,10 @@ class BeanConfig {
     @Bean
     fun clock(): Clock {
         return Clock.systemDefaultZone()
+    }
+
+    @Bean
+    fun random(): Random {
+        return Random()
     }
 }

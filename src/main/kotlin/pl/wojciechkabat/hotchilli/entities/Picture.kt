@@ -14,5 +14,9 @@ data class Picture(
         val externalIdentifier: String?,
 
         @Column(name = "url", nullable = false)
-        val url: String
+        val url: String,
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "user_id")
+        var owner: User
 )

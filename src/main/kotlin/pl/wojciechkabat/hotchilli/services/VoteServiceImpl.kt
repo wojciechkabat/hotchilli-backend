@@ -15,7 +15,11 @@ import java.time.LocalDateTime
 @Service
 class VoteServiceImpl(val voteRepository: VoteRepository, val clock: Clock) : VoteService {
     private val GUEST_VOTE_LIMIT: Int = 3
+
     override fun findVoteDataForUsers(userIds: List<Long>): List<VoteData> {
+        if(userIds.isEmpty()) {
+            return emptyList()
+        }
         return voteRepository.findVoteDataByUserIds(userIds)
     }
 
@@ -57,5 +61,9 @@ class VoteServiceImpl(val voteRepository: VoteRepository, val clock: Clock) : Vo
                         LocalDateTime.now(clock)
                 )
         )
+    }
+
+    override fun findIdsOfUsersVotedFor(userIdentifier: String): Set<Long> {
+        return voteRepository.findIdsOfUsersVotedFor(userIdentifier)
     }
 }

@@ -3,4 +3,5 @@ HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 
 /src/main/resources/security-config.properties
+/src/main/resources/cloudinary-config.properties
 

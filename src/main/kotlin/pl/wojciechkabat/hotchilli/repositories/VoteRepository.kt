@@ -22,4 +22,8 @@ interface VoteRepository: JpaRepository<Vote, Long> {
     @Query("SELECT new pl.wojciechkabat.hotchilli.dtos.VoteData(v.ratedUserId, avg(v.rating), count(v)) " +
             "FROM Vote v GROUP BY v.ratedUserId having v.ratedUserId = :userId")
     fun findVoteDataByUserId(@Param("userId") userId: Long): Optional<VoteData>
+
+    @Query("SELECT v.ratedUserId from Vote v where v.votingUserIdentifier = :userIdentifier")
+    fun findIdsOfUsersVotedFor(@Param("userIdentifier") userIdentifier: String): Set<Long>
+
 }

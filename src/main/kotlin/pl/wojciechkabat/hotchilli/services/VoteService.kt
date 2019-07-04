@@ -10,4 +10,5 @@ interface VoteService {
     fun persistGuestVote(guestVoteDto: GuestVoteDto)
     fun findVoteDataForUsers(userIds: List<Long>): List<VoteData>
     fun findVoteDataForUser(userId: Long): VoteData
+    fun findIdsOfUsersVotedFor(userIdentifier: String): Set<Long>
 }

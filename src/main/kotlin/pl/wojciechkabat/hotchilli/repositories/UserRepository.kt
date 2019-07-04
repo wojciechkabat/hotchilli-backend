@@ -1,5 +1,6 @@
 package pl.wojciechkabat.hotchilli.repositories
 
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -9,7 +10,12 @@ import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
-    @Query(nativeQuery=true, value="SELECT *  FROM users ORDER BY random() LIMIT :number")
-    fun findRandomUsers(@Param("number") numberOfUsers: Int): List<User>
+    @EntityGraph(value = "User.eagerPictures")
+    fun findUsersByIdIn(@Param("ids") ids: Set<Long>): List<User>
+
+    @EntityGraph(value = "User.eagerRoles")
     fun findByEmail(email: String): Optional<User>
+
+    @Query("SELECT coalesce(max(u.id), 0) FROM User u")
+    fun getMaxId(): Long
 }

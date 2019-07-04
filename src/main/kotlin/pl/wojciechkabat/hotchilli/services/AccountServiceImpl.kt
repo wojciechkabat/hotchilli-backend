@@ -3,12 +3,12 @@ package pl.wojciechkabat.hotchilli.services
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
+import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.User
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
-import pl.wojciechkabat.hotchilli.exceptions.NoSuchRoleInDbException
-import pl.wojciechkabat.hotchilli.exceptions.UserWithLoginAlreadyExistsException
+import pl.wojciechkabat.hotchilli.exceptions.*
+import pl.wojciechkabat.hotchilli.repositories.PictureRepository
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
@@ -20,6 +20,7 @@ import javax.transaction.Transactional
 class AccountServiceImpl(
         private val userRepository: UserRepository,
         private val roleRepository: RoleRepository,
+        private val pictureService: PictureService,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : AccountService {
     private val logger = LoggerFactory.getLogger(AccountService::class.java)
@@ -36,19 +37,42 @@ class AccountServiceImpl(
         validateEmailFormat(registrationDto.email)
         validatePasswordFormat(registrationDto.password)
 
-        userRepository.save(
-                User(
-                        null,
-                        registrationDto.email,
-                        registrationDto.username,
-                        bCryptPasswordEncoder.encode(registrationDto.password),
-                        registrationDto.dateOfBirth,
-                        PictureMapper.mapToEntity(registrationDto.pictures),
-                        listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() })))
-                )
+        val user = User(
+                id = null,
+                email = registrationDto.email,
+                username = registrationDto.username,
+                password = bCryptPasswordEncoder.encode(registrationDto.password),
+                dateOfBirth = registrationDto.dateOfBirth,
+                roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
+                gender = registrationDto.gender
         )
 
+        if(registrationDto.pictures.isNotEmpty()) {
+            registrationDto.pictures.stream().forEach { picture -> user.addPicture(
+                    Picture(null,
+                            picture.externalIdentifier,
+                            picture.url,
+                            user
+                    ))}
+        }
+
+        userRepository.save(user)
+
         logger.info("Account created for user with email: ${registrationDto.email}")
+    }
+
+    @Transactional
+    override fun addPicture(pictureDto: PictureDto, user: User): PictureDto {
+        val persistedPicture = pictureService.savePicture(pictureDto, user)
+        user.addPicture(persistedPicture)
+        return PictureMapper.mapToDto(persistedPicture)
+    }
+
+    override fun deletePicture(pictureId: Long, user: User) {
+        if(user.pictures.stream().noneMatch {picture -> pictureId == picture.id }) {
+            throw UserDoesNotOwnResourceException()
+        }
+        pictureService.deleteById(pictureId)
     }
 
     private fun validateEmailFormat(email: String) {
