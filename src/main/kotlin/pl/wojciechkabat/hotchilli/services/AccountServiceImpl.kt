@@ -1,6 +1,7 @@
 package pl.wojciechkabat.hotchilli.services
 
 import org.slf4j.LoggerFactory
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
@@ -12,9 +13,12 @@ import pl.wojciechkabat.hotchilli.repositories.PictureRepository
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
+import pl.wojciechkabat.hotchilli.security.exceptions.NoUserWithGivenEmailException
+import pl.wojciechkabat.hotchilli.security.model.RefreshTokenService
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import pl.wojciechkabat.hotchilli.utils.Validators
 import java.time.LocalDateTime
+import java.util.stream.Collectors
 import javax.transaction.Transactional
 
 @Service
@@ -22,6 +26,8 @@ class AccountServiceImpl(
         private val userRepository: UserRepository,
         private val roleRepository: RoleRepository,
         private val pictureService: PictureService,
+        private val voteService: VoteService,
+        private val refreshTokenService: RefreshTokenService,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : AccountService {
     private val logger = LoggerFactory.getLogger(AccountService::class.java)
@@ -61,6 +67,15 @@ class AccountServiceImpl(
         userRepository.save(user)
 
         logger.info("Account created for user with email: ${registrationDto.email}")
+    }
+
+    @Transactional
+    override fun deleteAccountFor(user: User) {
+        refreshTokenService.deleteByUser(user)
+        SecurityContextHolder.clearContext()
+        pictureService.deleteByIds(user.pictures.stream().map { picture -> picture.id!! }.collect(Collectors.toList()))
+        voteService.deleteAllVotesForUser(user)
+        userRepository.delete(user)
     }
 
     @Transactional

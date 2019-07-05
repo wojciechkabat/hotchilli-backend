@@ -33,6 +33,10 @@ class VoteServiceImpl(val voteRepository: VoteRepository, val clock: Clock) : Vo
         }
     }
 
+    override fun deleteAllVotesForUser(user: User) {
+        voteRepository.deleteAllVotesForUserWithId(user.id!!)
+    }
+
     override fun persistVote(voteDto: VoteDto, currentUser: User) {
         voteRepository.save(
                 Vote(

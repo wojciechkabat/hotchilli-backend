@@ -8,4 +8,5 @@ public interface RefreshTokenService {
     UUID save(RefreshToken refreshToken);
     RefreshToken findById(UUID id);
     void deleteByUserAndDeviceId(User user, String deviceId);
+    void deleteByUser(User user);
 }

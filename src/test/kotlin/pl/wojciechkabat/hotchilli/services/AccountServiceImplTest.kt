@@ -1,5 +1,7 @@
 package pl.wojciechkabat.hotchilli.services
 
+import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.*
@@ -19,6 +21,7 @@ import pl.wojciechkabat.hotchilli.exceptions.UserWithLoginAlreadyExistsException
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
+import pl.wojciechkabat.hotchilli.security.model.RefreshTokenService
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -33,6 +36,10 @@ class AccountServiceImplTest {
     lateinit var roleRepository: RoleRepository
     @Mock
     lateinit var pictureService: PictureService
+    @Mock
+    lateinit var refreshTokenService: RefreshTokenService
+    @Mock
+    lateinit var voteService: VoteService
     @Mock
     lateinit var bCryptPasswordEncoder: BCryptPasswordEncoder
     @InjectMocks
@@ -70,7 +77,7 @@ class AccountServiceImplTest {
 
 
         val expectedUser = User(
-                id =null,
+                id = null,
                 email = "some@email.com",
                 username = "someUserName",
                 password = "encodedPassword",
@@ -90,7 +97,7 @@ class AccountServiceImplTest {
         )
 
         assertThat(userArgumentCaptor.value).isEqualToIgnoringGivenFields(
-                expectedUser, "pictures"
+                expectedUser, "pictures", "createdAt"
         )
         assertThat(userArgumentCaptor.value.pictures.size).isEqualTo(1)
     }
@@ -147,7 +154,7 @@ class AccountServiceImplTest {
     @Test
     fun shouldAddUserPicture() {
         val user = User(
-                id =null,
+                id = null,
                 email = "some@email.com",
                 username = "someUserName",
                 password = "encodedPassword",
@@ -174,7 +181,7 @@ class AccountServiceImplTest {
     @Test
     fun shouldDeleteUserPicture() {
         val user = User(
-                id =null,
+                id = null,
                 email = "some@email.com",
                 username = "someUserName",
                 password = "encodedPassword",
@@ -194,7 +201,7 @@ class AccountServiceImplTest {
     @Test(expected = UserDoesNotOwnResourceException::class)
     fun shouldThrowExceptionIfUserDoesNotOwnPictureWhenDeletingUserPicture() {
         val user = User(
-                id =null,
+                id = null,
                 email = "some@email.com",
                 username = "someUserName",
                 password = "encodedPassword",
@@ -207,6 +214,103 @@ class AccountServiceImplTest {
         accountServiceImpl.deletePicture(123L, user)
 
         Mockito.verify(pictureService, times(1)).deleteById(123L)
+    }
+
+    @Test
+    fun shouldDeletePicturesWhenDeletingAccount() {
+        val user = User(
+                id = null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
+        )
+
+        user.pictures = mutableListOf(
+                Picture(
+                        122L,
+                        "someExternalId",
+                        "someUrl",
+                        user
+                ),
+                Picture(
+                        123L,
+                        "someExternalId",
+                        "someUrl",
+                        user
+                ))
+
+        accountServiceImpl.deleteAccountFor(user)
+
+        argumentCaptor<List<Long>>().apply {
+            verify(pictureService).deleteByIds(capture())
+            assertThat(firstValue).contains(122L, 123L)
+        }
+    }
+
+
+    @Test
+    fun shouldDeleteTokensWhenDeletingAccount() {
+        val user = User(
+                id = null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
+        )
+
+        accountServiceImpl.deleteAccountFor(user)
+
+        argumentCaptor<List<Long>>().apply {
+            verify(refreshTokenService).deleteByUser(user)
+        }
+    }
+
+
+    @Test
+    fun shouldDeleteAllVotesForUserWhenDeletingAccount() {
+        val user = User(
+                id = null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
+        )
+
+        accountServiceImpl.deleteAccountFor(user)
+
+        argumentCaptor<List<Long>>().apply {
+            verify(voteService).deleteAllVotesForUser(user)
+        }
+    }
+
+    @Test
+    fun shouldDeleteUserWhenDeletingAccount() {
+        val user = User(
+                id = null,
+                email = "some@email.com",
+                username = "someUserName",
+                password = "encodedPassword",
+                dateOfBirth = LocalDate.now(),
+                roles = listOf(Role(0, RoleEnum.USER)),
+                gender = Gender.MALE,
+                createdAt = LocalDateTime.now()
+        )
+
+        accountServiceImpl.deleteAccountFor(user)
+
+        argumentCaptor<List<Long>>().apply {
+            verify(userRepository).delete(user)
+        }
     }
 
     private fun mockUserEntity(email: String): User {

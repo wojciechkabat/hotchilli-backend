@@ -24,9 +24,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return tokenRepository.findById(id).orElseThrow(NoRefreshTokenFound::new);
     }
 
+    @Override
     @Transactional
     public void deleteByUserAndDeviceId(User user, String deviceId) {
         tokenRepository.deleteByUserAndDeviceId(user, deviceId);
+        tokenRepository.flush();
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUser(User user) {
+        tokenRepository.deleteByUser(user);
         tokenRepository.flush();
     }
 }

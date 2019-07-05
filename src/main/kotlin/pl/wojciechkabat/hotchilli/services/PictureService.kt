@@ -6,5 +6,6 @@ import pl.wojciechkabat.hotchilli.entities.User
 
 interface PictureService {
     fun deleteById(pictureId: Long)
+    fun deleteByIds(pictureIds: List<Long>)
     fun savePicture(pictureDto: PictureDto, user: User): Picture
 }

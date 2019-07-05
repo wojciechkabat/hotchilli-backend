@@ -29,4 +29,10 @@ class AccountController(
         val activeUser = securityService.retrieveActiveUser(principal)
         return accountService.deletePicture(pictureId, activeUser)
     }
+
+    @DeleteMapping("users/me")
+    fun deleteAccount(principal: Principal) {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        return accountService.deleteAccountFor(activeUser)
+    }
 }

@@ -33,13 +33,23 @@ class PictureServiceImpl(
     @Transactional
     override fun deleteById(pictureId: Long) {
         LOG.info("Attempting to delete picture with db id: $pictureId")
+        deletePictureById(pictureId)
+        LOG.info("Deleted picture with db id: $pictureId")
+    }
 
+    @Transactional
+    override fun deleteByIds(pictureIds: List<Long>) {
+        LOG.info("Attempting to delete pictures with db ids: $pictureIds")
+        pictureIds.stream().forEach { deletePictureById(it) }
+        LOG.info("Deleted pictures with db ids: $pictureIds")
+    }
+
+    private fun deletePictureById(pictureId: Long) {
         val picture = pictureRepository.findById(pictureId).orElseThrow(({ NoPictureWithGivenIdException() }))
         if (picture.externalIdentifier != null) {
             deleteFromRemoteServerByExternalId(picture.externalIdentifier)
         }
         pictureRepository.delete(picture)
-        LOG.info("Deleted picture with db id: $pictureId")
     }
 
     private fun deleteFromRemoteServerByExternalId(externalPictureId: String) {

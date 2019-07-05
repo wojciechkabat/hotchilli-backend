@@ -1,6 +1,7 @@
 package pl.wojciechkabat.hotchilli.repositories
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -25,5 +26,9 @@ interface VoteRepository: JpaRepository<Vote, Long> {
 
     @Query("SELECT v.ratedUserId from Vote v where v.votingUserIdentifier = :userIdentifier")
     fun findIdsOfUsersVotedFor(@Param("userIdentifier") userIdentifier: String): Set<Long>
+
+    @Query("DELETE from Vote v where v.ratedUserId = :ratedUserId")
+    @Modifying
+    fun deleteAllVotesForUserWithId(@Param("ratedUserId") ratedUserId: Long)
 
 }
