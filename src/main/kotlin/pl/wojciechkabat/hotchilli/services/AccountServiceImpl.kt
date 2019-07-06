@@ -74,6 +74,7 @@ class AccountServiceImpl(
         refreshTokenService.deleteByUser(user)
         SecurityContextHolder.clearContext()
         pictureService.deleteByIds(user.pictures.stream().map { picture -> picture.id!! }.collect(Collectors.toList()))
+        user.pictures.clear()
         voteService.deleteAllVotesForUser(user)
         userRepository.delete(user)
     }
