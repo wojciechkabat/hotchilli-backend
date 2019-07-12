@@ -27,6 +27,7 @@ class AccountServiceImpl(
         private val pictureService: PictureService,
         private val voteService: VoteService,
         private val pinService: PinService,
+        private val emailService: EmailService,
         private val refreshTokenService: RefreshTokenService,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : AccountService {
@@ -66,9 +67,14 @@ class AccountServiceImpl(
 
         val persistedUser = userRepository.save(user)
         val confirmationPin = pinService.generatePinFor(persistedUser, PinType.CONFIRMATION)
-        //fixme send email
 
         logger.info("Account created for user with email: ${registrationDto.email}")
+
+        emailService.sendAccountConfirmationEmail(
+                user.email,
+                "en", //fixme get language code of user somehow
+                confirmationPin
+        )
     }
 
     @Transactional

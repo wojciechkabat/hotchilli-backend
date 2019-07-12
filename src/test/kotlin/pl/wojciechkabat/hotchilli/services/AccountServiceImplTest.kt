@@ -38,6 +38,8 @@ class AccountServiceImplTest {
     @Mock
     lateinit var pictureService: PictureService
     @Mock
+    lateinit var emailService: EmailService
+    @Mock
     lateinit var refreshTokenService: RefreshTokenService
     @Mock
     lateinit var voteService: VoteService
@@ -53,28 +55,6 @@ class AccountServiceImplTest {
     fun shouldCorrectlyRegisterUser() {
         val userRole = Role(0, RoleEnum.USER)
         val dateOfBirth = LocalDate.now()
-
-        Mockito.`when`(bCryptPasswordEncoder.encode("123456Kk")).thenReturn("encodedPassword")
-        Mockito.`when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(userRole))
-
-        accountServiceImpl.register(
-                RegistrationDto(
-                        "some@email.com",
-                        "someUserName",
-                        "123456Kk",
-                        listOf(
-                                PictureDto(
-                                        null,
-                                        "externalIdentifier",
-                                        "http://url"
-                                )
-                        ),
-                        dateOfBirth,
-                        Gender.MALE
-                )
-        )
-
-        Mockito.verify(userRepository, times(1)).save(userArgumentCaptor.capture())
 
 
         val expectedUser = User(
@@ -96,6 +76,29 @@ class AccountServiceImplTest {
                         expectedUser
                 )
         )
+
+        Mockito.`when`(bCryptPasswordEncoder.encode("123456Kk")).thenReturn("encodedPassword")
+        Mockito.`when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(userRole))
+        Mockito.`when`(userRepository.save(any<User>())).thenReturn(expectedUser)
+
+        accountServiceImpl.register(
+                RegistrationDto(
+                        "some@email.com",
+                        "someUserName",
+                        "123456Kk",
+                        listOf(
+                                PictureDto(
+                                        null,
+                                        "externalIdentifier",
+                                        "http://url"
+                                )
+                        ),
+                        dateOfBirth,
+                        Gender.MALE
+                )
+        )
+
+        Mockito.verify(userRepository, times(1)).save(userArgumentCaptor.capture())
 
         assertThat(userArgumentCaptor.value).isEqualToIgnoringGivenFields(
                 expectedUser, "pictures", "createdAt"
@@ -360,5 +363,33 @@ class AccountServiceImplTest {
         )
 
         verify(pinService, times(1)).generatePinFor(persistedUser, PinType.CONFIRMATION)
+    }
+
+    @Test
+    fun shouldSendAccountConfirmationEmailWhenRegistering() {
+        val userToRegister = TestUtils.mockUserEntity(1L)
+
+        `when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(Role(1L, RoleEnum.USER)))
+        `when`(userRepository.save(any<User>())).thenReturn(userToRegister)
+        `when`(pinService.generatePinFor(userToRegister, PinType.CONFIRMATION)).thenReturn("1234")
+        `when`(bCryptPasswordEncoder.encode("123456Kk")).thenReturn("encodedPassword")
+
+        accountServiceImpl.register(
+                RegistrationDto(
+                        "some@email.com",
+                        "someUserName",
+                        "123456Kk",
+                        listOf(
+                                PictureDto(
+                                        null,
+                                        "externalIdentifier",
+                                        "http://url"
+                                )
+                        ),
+                        LocalDate.now(),
+                        Gender.MALE
+                )
+        )
+        verify(emailService).sendAccountConfirmationEmail("some@email.com", "en", "1234")
     }
 }
