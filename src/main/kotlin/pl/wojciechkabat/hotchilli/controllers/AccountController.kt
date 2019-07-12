@@ -6,6 +6,7 @@ import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
 import pl.wojciechkabat.hotchilli.services.AccountService
 import pl.wojciechkabat.hotchilli.services.SecurityService
 import java.security.Principal
+import javax.transaction.Transactional
 
 @RestController
 @CrossOrigin
@@ -40,5 +41,13 @@ class AccountController(
     fun accountConfirmation(principal: Principal, @RequestBody pin: String) {
         val activeUser = securityService.retrieveActiveUser(principal)
         accountService.confirmAccount(pin, activeUser)
+    }
+
+
+    @GetMapping("account/active")
+    @Transactional
+    fun isAccountActive(principal: Principal): Boolean? {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        return activeUser.isActive
     }
 }
