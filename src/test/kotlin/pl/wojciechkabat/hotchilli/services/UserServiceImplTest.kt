@@ -37,7 +37,7 @@ class UserServiceImplTest {
         Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
         Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
         Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 13L, 10L, 30L))
-        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(mockUserEntity(12L)))
+        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(TestUtils.mockUserEntity(12L)))
 
         userService.provideRandomUsers(GenderDisplayOption.MALE, requestingUserIdentifier)
 
@@ -55,7 +55,7 @@ class UserServiceImplTest {
         Mockito.`when`(userRepository.getMaxId()).thenReturn(250L)
         Mockito.`when`(voteService.findIdsOfUsersVotedFor(requestingUserIdentifier)).thenReturn(idsOfUsersAlreadyVotedFor)
         Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 1L))
-        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(mockUserEntity(12L)))
+        Mockito.`when`(userRepository.findUsersByIdIn(any())).thenReturn(listOf(TestUtils.mockUserEntity(12L)))
 
         userService.provideRandomUsers(GenderDisplayOption.MALE, requestingUserIdentifier)
 
@@ -109,19 +109,4 @@ class UserServiceImplTest {
     private fun generateLongStreamOf(vararg longs: Long): LongStream {
         return LongStream.of(*longs)
     }
-
-    private fun mockUserEntity(id: Long): User {
-        return User(
-                id,
-                "someEmail@pl.pl",
-                "someUserName",
-                "somePassword",
-                LocalDate.now(),
-                java.util.ArrayList(),
-                java.util.ArrayList(),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
-    }
-
 }

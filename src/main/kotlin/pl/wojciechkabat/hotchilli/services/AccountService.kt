@@ -9,4 +9,5 @@ interface AccountService {
     fun addPicture(pictureDto: PictureDto, user: User): PictureDto
     fun deletePicture(pictureId: Long, user: User)
     fun deleteAccountFor(user: User)
+    fun confirmAccount(pin: String, user: User)
 }

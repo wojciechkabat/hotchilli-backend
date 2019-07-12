@@ -43,7 +43,7 @@ class VoteServiceImplTest {
     fun shouldPersistVoteForLoggedInUser() {
         voteService.persistVote(
                 VoteDto(12L, 2.6),
-                mockUserEntity(1L)
+                TestUtils.mockUserEntity(1L)
         )
 
         Mockito.verify(voteRepository, times(1)).save(voteCaptor.capture())
@@ -92,19 +92,5 @@ class VoteServiceImplTest {
         Mockito.`when`(voteRepository.findVoteDataByUserId(120L)).thenReturn(Optional.empty())
         val voteData = voteService.findVoteDataForUser(120L)
         assertThat(voteData).isEqualTo(VoteData(120L, 0.0, 0))
-    }
-
-    private fun mockUserEntity(id: Long): User {
-        return User(
-                id,
-                "someEmail@pl.pl",
-                "someUserName",
-                "somePassword",
-                LocalDate.now(),
-                ArrayList(),
-                ArrayList(),
-                Gender.MALE,
-                LocalDateTime.now()
-        )
     }
 }

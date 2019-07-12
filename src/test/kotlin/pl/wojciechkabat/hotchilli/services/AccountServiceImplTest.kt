@@ -5,15 +5,14 @@ import com.nhaarman.mockito_kotlin.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
-import pl.wojciechkabat.hotchilli.entities.Gender
-import pl.wojciechkabat.hotchilli.entities.Picture
-import pl.wojciechkabat.hotchilli.entities.Role
-import pl.wojciechkabat.hotchilli.entities.User
+import pl.wojciechkabat.hotchilli.entities.*
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
 import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
 import pl.wojciechkabat.hotchilli.exceptions.UserDoesNotOwnResourceException
@@ -34,6 +33,8 @@ class AccountServiceImplTest {
     lateinit var userRepository: UserRepository
     @Mock
     lateinit var roleRepository: RoleRepository
+    @Mock
+    lateinit var pinService: PinService
     @Mock
     lateinit var pictureService: PictureService
     @Mock
@@ -106,7 +107,7 @@ class AccountServiceImplTest {
     fun shouldThrowExceptionWhenRegisteringAUserThatAlreadyExists() {
         val repeatingEmail = "repeated@email.pl"
 
-        Mockito.`when`(userRepository.findByEmail(repeatingEmail)).thenReturn(Optional.of(mockUserEntity(repeatingEmail)))
+        Mockito.`when`(userRepository.findByEmail(repeatingEmail)).thenReturn(Optional.of(TestUtils.mockUserEntity(repeatingEmail)))
 
         accountServiceImpl.register(
                 RegistrationDto(
@@ -313,17 +314,51 @@ class AccountServiceImplTest {
         }
     }
 
-    private fun mockUserEntity(email: String): User {
-        return User(
-                1L,
-                email,
-                "someUserName",
-                "somePassword",
-                LocalDate.now(),
-                ArrayList(),
-                ArrayList(),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
+    @Test
+    fun shouldConfirmAccount() {
+        val user = TestUtils.mockUserEntity("someEmail")
+        user.isActive = false
+
+        val pinValue = "1234"
+        val providedPinByUser = "1234"
+
+        `when`(pinService.findByTypeAndUser(PinType.CONFIRMATION, user)).thenReturn(
+                Pin(
+                        123L,
+                        pinValue,
+                        PinType.CONFIRMATION,
+                        user
+                )
         )
+        accountServiceImpl.confirmAccount(providedPinByUser, user)
+        assertThat(user.isActive!!).isTrue()
+    }
+
+    @Test
+    fun shouldGenerateAndPersistConfirmationPinWhenRegistering() {
+        val persistedUser = TestUtils.mockUserEntity(99L)
+
+        `when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(Role(1L, RoleEnum.USER)))
+        `when`(userRepository.save(any<User>())).thenReturn(persistedUser)
+        `when`(bCryptPasswordEncoder.encode(any())).thenReturn("someEncodedPassword")
+
+        accountServiceImpl.register(
+                RegistrationDto(
+                        "some@email.com",
+                        "someUserName",
+                        "123456Kk",
+                        listOf(
+                                PictureDto(
+                                        null,
+                                        "externalIdentifier",
+                                        "http://url"
+                                )
+                        ),
+                        LocalDate.now(),
+                        Gender.MALE
+                )
+        )
+
+        verify(pinService, times(1)).generatePinFor(persistedUser, PinType.CONFIRMATION)
     }
 }

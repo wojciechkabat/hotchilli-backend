@@ -45,7 +45,10 @@ data class User(
         var gender: Gender,
 
         @Column(name = "created_at")
-        var createdAt: LocalDateTime
+        var createdAt: LocalDateTime,
+
+        @Column(name = "is_active")
+        var isActive: Boolean? = null
 ) {
     fun addPicture(picture: Picture) {
         pictures.add(picture)

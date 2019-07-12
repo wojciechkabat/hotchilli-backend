@@ -13,11 +13,6 @@ class AccountController(
         val accountService: AccountService,
         val securityService: SecurityService
 ) {
-    @PostMapping("/registration")
-    fun register(@RequestBody registrationDto: RegistrationDto) {
-        accountService.register(registrationDto)
-    }
-
     @PostMapping("/pictures")
     fun addPicture(principal: Principal, @RequestBody pictureDto: PictureDto): PictureDto{
         val activeUser = securityService.retrieveActiveUser(principal)
@@ -34,5 +29,16 @@ class AccountController(
     fun deleteAccount(principal: Principal) {
         val activeUser = securityService.retrieveActiveUser(principal)
         return accountService.deleteAccountFor(activeUser)
+    }
+
+    @PostMapping("/registration")
+    fun register(@RequestBody registrationDto: RegistrationDto) {
+        accountService.register(registrationDto)
+    }
+
+    @PutMapping("/registration/confirmation")
+    fun accountConfirmation(principal: Principal, @RequestBody pin: String) {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        accountService.confirmAccount(pin, activeUser)
     }
 }
