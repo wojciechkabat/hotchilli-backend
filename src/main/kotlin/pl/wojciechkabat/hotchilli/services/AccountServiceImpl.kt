@@ -9,6 +9,7 @@ import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
 import pl.wojciechkabat.hotchilli.entities.Picture
 import pl.wojciechkabat.hotchilli.entities.PinType
 import pl.wojciechkabat.hotchilli.entities.User
+import pl.wojciechkabat.hotchilli.entities.UserSettings
 import pl.wojciechkabat.hotchilli.exceptions.*
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
@@ -17,6 +18,7 @@ import pl.wojciechkabat.hotchilli.security.model.RefreshTokenService
 import pl.wojciechkabat.hotchilli.utils.PictureMapper
 import pl.wojciechkabat.hotchilli.utils.Validators
 import java.time.LocalDateTime
+import java.util.*
 import java.util.stream.Collectors
 import javax.transaction.Transactional
 
@@ -32,6 +34,7 @@ class AccountServiceImpl(
         private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : AccountService {
     private val logger = LoggerFactory.getLogger(AccountService::class.java)
+    private val SUPPORTED_PUSH_NOTIFICATION_LANGUAGES = Arrays.asList("pl", "en")
 
     @Transactional
     override fun register(registrationDto: RegistrationDto) {
@@ -53,7 +56,9 @@ class AccountServiceImpl(
                 dateOfBirth = registrationDto.dateOfBirth,
                 roles = listOf(roleRepository.findByValue(RoleEnum.USER).orElseThrow(({ NoSuchRoleInDbException() }))),
                 gender = registrationDto.gender,
-                createdAt = LocalDateTime.now()
+                createdAt = LocalDateTime.now(),
+                isActive = false,
+                userSettings = UserSettings(null, true, determineSupportedPushNotificationLanguage(registrationDto.languageCode))
         )
 
         if(registrationDto.pictures.isNotEmpty()) {
@@ -72,7 +77,7 @@ class AccountServiceImpl(
 
         emailService.sendAccountConfirmationEmail(
                 user.email,
-                "en", //fixme get language code of user somehow
+                persistedUser.userSettings.notificationsLanguageCode,
                 confirmationPin
         )
     }
@@ -126,5 +131,11 @@ class AccountServiceImpl(
             logger.error("Wrong password format")
             throw IncorrectPasswordFormatException()
         }
+    }
+
+
+    private fun determineSupportedPushNotificationLanguage(userLanguageCode: String?): String {
+        val langugeCodeToPersist: String = userLanguageCode ?: "en"
+        return if (SUPPORTED_PUSH_NOTIFICATION_LANGUAGES.contains(langugeCodeToPersist.toLowerCase())) langugeCodeToPersist.toLowerCase() else "en"
     }
 }

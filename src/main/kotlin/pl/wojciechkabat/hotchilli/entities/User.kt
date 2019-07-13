@@ -48,7 +48,12 @@ data class User(
         var createdAt: LocalDateTime,
 
         @Column(name = "is_active")
-        var isActive: Boolean? = null
+        var isActive: Boolean? = null,
+
+        @OneToOne(fetch = FetchType.LAZY)
+        @Cascade(CascadeType.ALL)
+        @JoinColumn(name = "settings_id")
+        val userSettings: UserSettings
 ) {
     fun addPicture(picture: Picture) {
         pictures.add(picture)

@@ -65,7 +65,9 @@ class AccountServiceImplTest {
                 dateOfBirth = dateOfBirth,
                 roles = listOf(userRole),
                 gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
+                createdAt = LocalDateTime.now(),
+                isActive = false,
+                userSettings = UserSettings(null, true, "pl")
         )
 
         expectedUser.pictures = mutableListOf(
@@ -94,7 +96,8 @@ class AccountServiceImplTest {
                                 )
                         ),
                         dateOfBirth,
-                        Gender.MALE
+                        Gender.MALE,
+                        "pl"
                 )
         )
 
@@ -157,16 +160,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldAddUserPicture() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         val pictureDto = PictureDto(
                 null,
@@ -184,16 +178,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldDeleteUserPicture() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         user.pictures.add(Picture(123L, "asd", "asda", user))
 
@@ -204,16 +189,8 @@ class AccountServiceImplTest {
 
     @Test(expected = UserDoesNotOwnResourceException::class)
     fun shouldThrowExceptionIfUserDoesNotOwnPictureWhenDeletingUserPicture() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
+        user.pictures = ArrayList()
 
         accountServiceImpl.deletePicture(123L, user)
 
@@ -222,16 +199,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldDeletePicturesWhenDeletingAccount() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         user.pictures = mutableListOf(
                 Picture(
@@ -258,16 +226,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldDeleteTokensWhenDeletingAccount() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         accountServiceImpl.deleteAccountFor(user)
 
@@ -279,16 +238,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldDeleteAllVotesForUserWhenDeletingAccount() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         accountServiceImpl.deleteAccountFor(user)
 
@@ -299,16 +249,7 @@ class AccountServiceImplTest {
 
     @Test
     fun shouldDeleteUserWhenDeletingAccount() {
-        val user = User(
-                id = null,
-                email = "some@email.com",
-                username = "someUserName",
-                password = "encodedPassword",
-                dateOfBirth = LocalDate.now(),
-                roles = listOf(Role(0, RoleEnum.USER)),
-                gender = Gender.MALE,
-                createdAt = LocalDateTime.now()
-        )
+        val user = TestUtils.mockUserEntity("someemail")
 
         accountServiceImpl.deleteAccountFor(user)
 
@@ -391,5 +332,73 @@ class AccountServiceImplTest {
                 )
         )
         verify(emailService).sendAccountConfirmationEmail("some@email.com", "en", "1234")
+    }
+
+    @Test
+    fun shouldSetPushNotificationsLanguageToSupportedLanguageWhenRegistering() {
+        `when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(Role(1L, RoleEnum.USER)))
+        `when`(userRepository.save(any<User>())).thenReturn(TestUtils.mockUserEntity("somemeial"))
+        `when`(bCryptPasswordEncoder.encode("123456Kk")).thenReturn("encodedPassword")
+
+        accountServiceImpl.register(
+                RegistrationDto(
+                        "some@email.com",
+                        "someUserName",
+                        "123456Kk",
+                        listOf(
+                                PictureDto(
+                                        null,
+                                        "externalIdentifier",
+                                        "http://url"
+                                )
+                        ),
+                        LocalDate.now(),
+                        Gender.MALE,
+                        "pl"
+                )
+        )
+
+        verify(userRepository).save(userArgumentCaptor.capture())
+        assertThat(userArgumentCaptor.value.userSettings).isEqualToComparingFieldByField(
+                UserSettings(
+                        null,
+                        true,
+                        "pl"
+                )
+        )
+    }
+
+    @Test
+    fun shouldSetPushNotificationsLanguageToEnglishIfUserLanguageNotSupportedWhenRegistering() {
+        `when`(roleRepository.findByValue(RoleEnum.USER)).thenReturn(Optional.of(Role(1L, RoleEnum.USER)))
+        `when`(userRepository.save(any<User>())).thenReturn(TestUtils.mockUserEntity("somemeial"))
+        `when`(bCryptPasswordEncoder.encode("123456Kk")).thenReturn("encodedPassword")
+
+        accountServiceImpl.register(
+                RegistrationDto(
+                        "some@email.com",
+                        "someUserName",
+                        "123456Kk",
+                        listOf(
+                                PictureDto(
+                                        null,
+                                        "externalIdentifier",
+                                        "http://url"
+                                )
+                        ),
+                        LocalDate.now(),
+                        Gender.MALE,
+                        "hu"
+                )
+        )
+
+        verify(userRepository).save(userArgumentCaptor.capture())
+        assertThat(userArgumentCaptor.value.userSettings).isEqualToComparingFieldByField(
+                UserSettings(
+                        null,
+                        true,
+                        "en"
+                )
+        )
     }
 }

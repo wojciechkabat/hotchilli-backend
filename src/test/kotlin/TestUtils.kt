@@ -1,5 +1,6 @@
 import pl.wojciechkabat.hotchilli.entities.Gender
 import pl.wojciechkabat.hotchilli.entities.User
+import pl.wojciechkabat.hotchilli.entities.UserSettings
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -15,7 +16,8 @@ class TestUtils  {
                     ArrayList(),
                     ArrayList(),
                     gender = Gender.MALE,
-                    createdAt = LocalDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    userSettings = UserSettings(1L, true, "en")
             )
         }
 
@@ -29,7 +31,8 @@ class TestUtils  {
                     java.util.ArrayList(),
                     java.util.ArrayList(),
                     gender = Gender.MALE,
-                    createdAt = LocalDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    userSettings = UserSettings(1L, true, "en")
             )
         }
     }
