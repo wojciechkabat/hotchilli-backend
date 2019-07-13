@@ -20,19 +20,15 @@ class EmailServiceImpl(
         val translationService: TranslationService
 ) : EmailService {
     private val logger = LoggerFactory.getLogger(EmailService::class.java)
-    private val pinConfirmationEmailTemplates = HashMap<String, String>()
-
-    init {
-        pinConfirmationEmailTemplates["pl"] = "pin-email-pl"
-        pinConfirmationEmailTemplates["en"] = "pin-email-en"
-    }
 
     @Async
     override fun sendAccountConfirmationEmail(email: String, languageCode: String, pin: String) {
         val context = Context()
         context.setVariable("pin", pin)
+        context.setVariable("bodyText", translationService.getTranslation("EMAIL_CONFIRMATION_PIN_BODY", languageCode))
+        context.setVariable("footerText", translationService.getTranslation("EMAIL_CONFIRMATION_PIN_FOOTER", languageCode))
 
-        val body = templateEngine.process(resolvePINEmailTemplateNameFor(languageCode.toLowerCase()), context)
+        val body = templateEngine.process("pin-email-template", context)
         val emailContentDto = EmailContentDto(
                 email,
                 translationService.getTranslation("EMAIL_CONFIRMATION_PIN_TITLE", languageCode),
@@ -62,9 +58,5 @@ class EmailServiceImpl(
             throw EmailCreationException()
         }
 
-    }
-
-    private fun resolvePINEmailTemplateNameFor(languageCode: String): String {
-        return pinConfirmationEmailTemplates[languageCode] ?: pinConfirmationEmailTemplates["en"]!!
     }
 }

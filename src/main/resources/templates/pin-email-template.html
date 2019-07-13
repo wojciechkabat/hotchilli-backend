@@ -11,6 +11,13 @@
             line-height: 1.5;
         }
 
+        .app-name {
+            color: white;
+            letter-spacing: 1px;
+            font-size: 30px;
+            font-family: 'Roboto', sans-serif;
+        }
+
         .gradient-background {
             background-image: linear-gradient(to right top, #fd495e, #fe525b, #fe5b58, #fe6456, #fe6c54);
         }
@@ -33,27 +40,36 @@
         }
 
         .link {
-            color: white!important;
-            text-decoration: none!important;
+            color: white !important;
+            text-decoration: none !important;
             font-weight: bold;
         }
 
         a {
-            color: white!important;
-            text-decoration: none!important;
+            color: white !important;
+            text-decoration: none !important;
         }
     </style>
 </head>
 <body>
 <table width="100%" cellpadding="0" cellspacing="0" class="gradient-background">
     <tr>
-        <td align="center" height="200px">
-            <img src="https://giftboxapplication.com/welcome-page-app-logo.png" width="200px">
+        <td align="center" height="150px">
+            <img src="https://res.cloudinary.com/hotchillicloud/image/upload/v1563019051/logos_etc/vbu6kirxqeou0jnxjsev.png"
+                 style="margin-top: 20px"
+                 width="150px">
+        </td>
+    </tr>
+    <tr>
+        <td height="50" align="center" class="app-name">
+            hot<b>chilli</b>
         </td>
     </tr>
     <tr>
         <td height="100" align="center">
-            <div>Welcome to HotChilli! Below you can find the PIN code necessary for account confirmation: </div>
+            <div th:text="${bodyText}">Welcome to HotChilli! Below you can find the PIN code necessary for account
+                confirmation:
+            </div>
         </td>
     </tr>
     <tr bgcolor="ffffff">
@@ -61,7 +77,11 @@
     </tr>
     <tr class="gradient-background">
         <td height="100" align="center">
-            <div>If you need assistance, contact us at: <a href="mailto:help@hotchilliapplication.com"><span class="link">help@hotchilliapplication.com</span></a></div>
+            <div>
+                <span th:text="${footerText}">If you need assistance, contact us at: </span>
+                <a href="mailto:help@hotchilliapplication.com"><span
+                        class="link">help@hotchilliapplication.com</span></a>
+            </div>
         </td>
     </tr>
 </table>
