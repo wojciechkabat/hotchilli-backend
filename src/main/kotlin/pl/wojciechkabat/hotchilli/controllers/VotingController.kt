@@ -5,6 +5,7 @@ import pl.wojciechkabat.hotchilli.dtos.VoteDto
 import pl.wojciechkabat.hotchilli.dtos.GuestVoteDto
 import pl.wojciechkabat.hotchilli.entities.Gender
 import pl.wojciechkabat.hotchilli.entities.User
+import pl.wojciechkabat.hotchilli.entities.UserSettings
 import pl.wojciechkabat.hotchilli.services.VoteService
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,7 +19,7 @@ class VotingController(
 ) {
     @PostMapping("/voting")
     fun postVote(@RequestBody voteDto: VoteDto) {
-        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", "Adsa", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, LocalDateTime.now())
+        val currentUser = User(Random().nextLong(), "currentUser", "asdsad", "Adsa", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, LocalDateTime.now(), true, UserSettings(1L, true, "en"))
         voteService.persistVote(voteDto, currentUser)
     }
 

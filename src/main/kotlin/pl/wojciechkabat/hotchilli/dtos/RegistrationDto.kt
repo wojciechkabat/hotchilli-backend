@@ -9,5 +9,6 @@ data class RegistrationDto (
         val password: String,
         val pictures: List<PictureDto>,
         val dateOfBirth: LocalDate,
-        val gender: Gender
+        val gender: Gender,
+        val languageCode: String? = null
 )
