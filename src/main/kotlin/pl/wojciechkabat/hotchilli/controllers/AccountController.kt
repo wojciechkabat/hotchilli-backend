@@ -43,6 +43,12 @@ class AccountController(
         accountService.confirmAccount(pin, activeUser)
     }
 
+    @GetMapping("/registration/confirmation/resend")
+    fun resendConfirmationEmail(principal: Principal) {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        accountService.resendConfirmationEmail(activeUser)
+    }
+
 
     @GetMapping("account/active")
     @Transactional

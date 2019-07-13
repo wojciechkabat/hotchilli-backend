@@ -401,4 +401,19 @@ class AccountServiceImplTest {
                 )
         )
     }
+
+    @Test
+    fun shouldResendConfirmationPinEmail() {
+        val user = TestUtils.mockUserEntity("someemail@pl.pl")
+        `when`(pinService.generatePinFor(user, PinType.CONFIRMATION)).thenReturn("1234")
+        accountServiceImpl.resendConfirmationEmail(user)
+        verify(emailService, times(1)).sendAccountConfirmationEmail("someemail@pl.pl", "en", "1234")
+    }
+
+    @Test
+    fun shouldGenerateNewPinWhenResendingConfirmationMail() {
+        val user = TestUtils.mockUserEntity("someemail@pl.pl")
+        accountServiceImpl.resendConfirmationEmail(user)
+        verify(pinService, times(1)).generatePinFor(user, PinType.CONFIRMATION)
+    }
 }

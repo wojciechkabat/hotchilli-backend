@@ -94,6 +94,16 @@ class AccountServiceImpl(
         logger.info("Account confirmed for user with email: ${user.email}")
     }
 
+    override fun resendConfirmationEmail(activeUser: User) {
+        logger.info("Resend confirmation email function invoked: " + activeUser.email)
+        val confirmationPin = pinService.generatePinFor(activeUser, PinType.CONFIRMATION)
+        emailService.sendAccountConfirmationEmail(
+                activeUser.email,
+                activeUser.userSettings.notificationsLanguageCode,
+                confirmationPin
+        )
+    }
+
     @Transactional
     override fun deleteAccountFor(user: User) {
         refreshTokenService.deleteByUser(user)
