@@ -18,4 +18,6 @@ interface UserRepository : JpaRepository<User, Long> {
 
     @Query("SELECT coalesce(max(u.id), 0) FROM User u")
     fun getMaxId(): Long
+
+    fun findByFacebookId(facebookId: String): Optional<User>
 }

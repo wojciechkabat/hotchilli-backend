@@ -21,11 +21,14 @@ data class User(
         @Column(name = "email", nullable = false)
         var email: String,
 
+        @Column(name = "facebook_id")
+        var facebookId: String? = null,
+
         @Column(name = "username", nullable = false)
         var username: String,
 
         @Column(name = "password")
-        var password: String,
+        var password: String? = null,
 
         @Column(name = "birthday")
         var dateOfBirth: LocalDate,
@@ -38,7 +41,7 @@ data class User(
         @JoinTable(name = "user_roles",
                 joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")])
-        var roles: List<Role>,
+        var roles: MutableList<Role>,
 
         @Column(name = "gender")
         @Enumerated(EnumType.STRING)

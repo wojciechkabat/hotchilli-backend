@@ -1,0 +1,1 @@
+ALTER TABLE users ADD column facebook_id varchar(30);

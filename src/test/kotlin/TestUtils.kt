@@ -10,6 +10,7 @@ class TestUtils  {
             return User(
                     1L,
                     email,
+                    "someFacebookId",
                     "someUserName",
                     "somePassword",
                     LocalDate.now(),
@@ -27,6 +28,7 @@ class TestUtils  {
                     "someEmail@pl.pl",
                     "someUserName",
                     "somePassword",
+                    "someFacebookId",
                     LocalDate.now(),
                     java.util.ArrayList(),
                     java.util.ArrayList(),

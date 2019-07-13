@@ -74,9 +74,9 @@ class UserServiceImplTest {
         Mockito.`when`(random.longs(ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong())).thenReturn(generateLongStreamOf(12L, 10L, 30L, 31L, 45L))
         Mockito.`when`(userRepository.findUsersByIdIn(expectedFilteredOutUserIds)).thenReturn(
                 listOf(
-                        User(12L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en")),
-                        User(31L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en")),
-                        User(45L, "email", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en"))
+                        User(12L, "email", "someFacebookId", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.MALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en")),
+                        User(31L, "email", "someFacebookId", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en")),
+                        User(45L, "email", "someFacebookId", "username", "password", LocalDate.now(), ArrayList(), ArrayList(), Gender.FEMALE, createdAt = LocalDateTime.now(), userSettings = UserSettings(12L, true, "en"))
                 )
         )
 

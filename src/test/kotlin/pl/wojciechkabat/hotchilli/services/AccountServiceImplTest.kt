@@ -21,6 +21,7 @@ import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
 import pl.wojciechkabat.hotchilli.security.model.RefreshTokenService
+import pl.wojciechkabat.hotchilli.security.model.TokenService
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -39,6 +40,8 @@ class AccountServiceImplTest {
     lateinit var pictureService: PictureService
     @Mock
     lateinit var emailService: EmailService
+    @Mock
+    lateinit var tokenService: TokenService
     @Mock
     lateinit var refreshTokenService: RefreshTokenService
     @Mock
@@ -60,10 +63,11 @@ class AccountServiceImplTest {
         val expectedUser = User(
                 id = null,
                 email = "some@email.com",
+                facebookId = null,
                 username = "someUserName",
                 password = "encodedPassword",
                 dateOfBirth = dateOfBirth,
-                roles = listOf(userRole),
+                roles = mutableListOf(userRole),
                 gender = Gender.MALE,
                 createdAt = LocalDateTime.now(),
                 isActive = false,

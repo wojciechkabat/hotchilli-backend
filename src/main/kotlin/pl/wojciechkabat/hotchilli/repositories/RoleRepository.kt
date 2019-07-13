@@ -9,4 +9,5 @@ import java.util.*
 @Repository
 interface RoleRepository: JpaRepository<Role, Long> {
     fun findByValue(value: RoleEnum): Optional<Role>
+    fun findByValueIn(values: List<RoleEnum>): MutableList<Role>
 }

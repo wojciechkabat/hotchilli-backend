@@ -37,5 +37,4 @@ class UserController(
                                @RequestParam("deviceId") deviceId: String): List<UserDto> {
         return userService.provideRandomUsers(genderDisplayOption, deviceId)
     }
-
 }

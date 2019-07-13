@@ -4,4 +4,5 @@ HELP.md
 
 /src/main/resources/security-config.properties
 /src/main/resources/cloudinary-config.properties
+/src/main/resources/facebook-config.properties
 
