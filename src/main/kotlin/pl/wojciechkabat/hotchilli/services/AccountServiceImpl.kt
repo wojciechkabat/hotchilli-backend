@@ -200,7 +200,7 @@ class AccountServiceImpl(
                 id = null,
                 email = parseEmail(facebookUser),
                 facebookId = facebookUser.facebookId,
-                username = "${facebookUser.firstName} ${facebookUser.lastName}",
+                username = facebookUser.firstName,
                 password = null,
                 dateOfBirth = parseDateFrom(facebookUser.birthday),
                 pictures = ArrayList(),

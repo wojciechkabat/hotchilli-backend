@@ -49,6 +49,7 @@ class PictureServiceImpl(
         if (picture.externalIdentifier != null) {
             deleteFromRemoteServerByExternalId(picture.externalIdentifier)
         }
+        picture.owner.pictures.remove(picture)
         pictureRepository.delete(picture)
     }
 
