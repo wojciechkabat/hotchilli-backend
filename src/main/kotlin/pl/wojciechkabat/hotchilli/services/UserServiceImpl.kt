@@ -98,6 +98,7 @@ class UserServiceImpl(val userRepository: UserRepository, val voteService: VoteS
                 .filter{genderDisplayOption == GenderDisplayOption.ALL || it.gender.name == genderDisplayOption.name}
                 .limit(RANDOM_USERS_BATCH_SIZE)
                 .collect(toList())
+        //fixme filter out inactive users
     }
 
     private fun getRandomUserIdsNotVotedForBefore(requestingUserIdentifier: String): Set<Long> {

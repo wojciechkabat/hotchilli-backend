@@ -207,7 +207,7 @@ class AccountServiceImpl(
                 roles = roleRepository.findByValueIn(listOf(RoleEnum.USER, RoleEnum.FACEBOOK_USER)),
                 gender = parseSexFrom(facebookUser.gender),
                 createdAt = LocalDateTime.now(),
-                isActive = true,
+                isActive = false,
                 userSettings = UserSettings(null, true, determineSupportedPushNotificationLanguage(facebookLoginDto.languageCode))
         )
         return userRepository.save(userToCreate)

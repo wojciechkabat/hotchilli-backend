@@ -8,8 +8,8 @@ import pl.wojciechkabat.hotchilli.exceptions.NoUserAssociatedToFacebookIdExcepti
 import pl.wojciechkabat.hotchilli.services.AccountService
 import pl.wojciechkabat.hotchilli.services.FacebookService
 import pl.wojciechkabat.hotchilli.services.SecurityService
+import pl.wojciechkabat.hotchilli.utils.facebookModels.FacebookPhoto
 import java.security.Principal
-import javax.transaction.Transactional
 
 @RestController
 @CrossOrigin
@@ -69,9 +69,13 @@ class AccountController(
 
 
     @GetMapping("account/active")
-    @Transactional
     fun isAccountActive(principal: Principal): Boolean? {
         val activeUser = securityService.retrieveActiveUser(principal)
         return activeUser.isActive
+    }
+
+    @GetMapping("pictures/fb")
+    fun getFacebookPhotos(@RequestHeader("fb-access-token") accessToken: String): List<FacebookPhoto> {
+        return this.facebookService.getCurrentUserFacebookPhotos(accessToken)
     }
 }

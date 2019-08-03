@@ -3,7 +3,6 @@ package pl.wojciechkabat.hotchilli.utils.facebookModels;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import pl.wojciechkabat.hotchilli.utils.facebookModels.responseModels.FacebookUserDeserializer;
@@ -18,7 +17,6 @@ public class FacebookUser {
     private String firstName;
     private String lastName;
     private String email;
-    private FacebookPicture facebookPicture;
     private String gender;
     private String birthday;
 
@@ -36,10 +34,6 @@ public class FacebookUser {
 
     public String getEmail() {
         return email;
-    }
-
-    public FacebookPicture getFacebookPicture() {
-        return facebookPicture;
     }
 
     public String getGender() {
