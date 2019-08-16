@@ -10,18 +10,17 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import pl.wojciechkabat.hotchilli.dtos.FacebookPostRegistrationDto
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
 import pl.wojciechkabat.hotchilli.entities.*
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectEmailFormatException
-import pl.wojciechkabat.hotchilli.exceptions.IncorrectPasswordFormatException
-import pl.wojciechkabat.hotchilli.exceptions.UserDoesNotOwnResourceException
-import pl.wojciechkabat.hotchilli.exceptions.UserWithLoginAlreadyExistsException
+import pl.wojciechkabat.hotchilli.exceptions.*
 import pl.wojciechkabat.hotchilli.repositories.RoleRepository
 import pl.wojciechkabat.hotchilli.repositories.UserRepository
 import pl.wojciechkabat.hotchilli.security.common.RoleEnum
 import pl.wojciechkabat.hotchilli.security.model.RefreshTokenService
 import pl.wojciechkabat.hotchilli.security.model.TokenService
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -419,5 +418,48 @@ class AccountServiceImplTest {
         val user = TestUtils.mockUserEntity("someemail@pl.pl")
         accountServiceImpl.resendConfirmationEmail(user)
         verify(pinService, times(1)).generatePinFor(user, PinType.CONFIRMATION)
+    }
+
+    @Test
+    fun shouldPostRegisterUserAfterFacebookFirstLogin() {
+        val user = TestUtils.mockUserEntity("someemail@pl.pl")
+        val postRegistrationDto = FacebookPostRegistrationDto(
+                "newUserName",
+                mutableListOf(PictureDto(null, "someExternalIdentifier", "someUrl")),
+                LocalDate.MIN,
+                Gender.FEMALE
+        )
+        accountServiceImpl.postRegisterFacebookUser(user, postRegistrationDto)
+        assertThat(user.username).isEqualTo("newUserName")
+        assertThat(user.gender).isEqualTo(Gender.FEMALE)
+        assertThat(user.dateOfBirth).isEqualTo(LocalDate.MIN)
+        assertThat(user.pictures.size).isEqualTo(1)
+        assertThat(user.isActive).isTrue()
+    }
+
+    @Test(expected = NotAFacebookUserException::class)
+    fun shouldThrowExceptionWhenTryingToPostRegisterANonFacebookUser() {
+        val user = TestUtils.mockUserEntity("someemail@pl.pl")
+        user.facebookId = null
+        val postRegistrationDto = FacebookPostRegistrationDto(
+                "newUserName",
+                mutableListOf(PictureDto(null, "someExternalIdentifier", "someUrl")),
+                LocalDate.MIN,
+                Gender.FEMALE
+        )
+        accountServiceImpl.postRegisterFacebookUser(user, postRegistrationDto)
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun shouldThrowExceptionWhenTryingToPostRegisterAnAlreadyActiveUser() {
+        val user = TestUtils.mockUserEntity("someemail@pl.pl")
+        user.isActive = true
+        val postRegistrationDto = FacebookPostRegistrationDto(
+                "newUserName",
+                mutableListOf(PictureDto(null, "someExternalIdentifier", "someUrl")),
+                LocalDate.MIN,
+                Gender.FEMALE
+        )
+        accountServiceImpl.postRegisterFacebookUser(user, postRegistrationDto)
     }
 }

@@ -2,6 +2,7 @@ package pl.wojciechkabat.hotchilli.controllers
 
 import org.springframework.web.bind.annotation.*
 import pl.wojciechkabat.hotchilli.dtos.FacebookLoginDto
+import pl.wojciechkabat.hotchilli.dtos.FacebookPostRegistrationDto
 import pl.wojciechkabat.hotchilli.dtos.PictureDto
 import pl.wojciechkabat.hotchilli.dtos.RegistrationDto
 import pl.wojciechkabat.hotchilli.exceptions.NoUserAssociatedToFacebookIdException
@@ -53,6 +54,12 @@ class AccountController(
         }
 
         return authTokens
+    }
+
+    @PutMapping("/registration/post-fb")
+    fun postFacebookRegistration(principal: Principal, @RequestBody facebookPostRegistrationDto: FacebookPostRegistrationDto) {
+        val activeUser = securityService.retrieveActiveUser(principal)
+        accountService.postRegisterFacebookUser(activeUser, facebookPostRegistrationDto)
     }
 
     @PutMapping("/registration/confirmation")
